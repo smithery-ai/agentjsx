@@ -55,8 +55,12 @@ export type {
 } from "./types";
 export {
   createAiGatewayInfer,
+  createOpenRouterInfer,
   type AiGatewayOptions,
   type AiGatewayUsage,
+  type OpenRouterOptions,
+  type OpenRouterUsage,
+  type SharedUsage,
 } from "./providers";
 export { defineTool, type DefineToolOptions } from "./define-tool";
 export {
