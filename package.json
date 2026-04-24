@@ -1,7 +1,6 @@
 {
   "name": "effectctx",
   "version": "0.1.0",
-  "private": true,
   "description": "an effect based agent harness",
   "license": "MIT",
   "author": "Arjun Kumar",
