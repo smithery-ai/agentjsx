@@ -1,8 +1,9 @@
-// Vercel AI Gateway-backed InferFn. Routes every completion through the
-// Gateway, which proxies `<provider>/<model>` ids to the upstream —
-// no client-side dispatch table. Auth is a standard Bearer header.
+// OpenRouter-backed InferFn. OpenRouter routes `<provider>/<model>`
+// ids to underlying upstreams (same shape as the Vercel AI Gateway,
+// different vendor). Uses `@openrouter/ai-sdk-provider` under the hood.
 
-import { createGateway, generateText } from "ai";
+import { generateText } from "ai";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
 
 import type {
   InferFn,
@@ -20,46 +21,57 @@ import {
   type SharedUsage,
 } from "./shared";
 
-export type AiGatewayUsage = SharedUsage;
+export type OpenRouterUsage = SharedUsage;
 
-export interface AiGatewayOptions {
+export interface OpenRouterOptions {
   apiKey: string;
-  // Canonical AI Gateway `<provider>/<model>` id —
-  // e.g. `openai/gpt-5-mini`, `anthropic/claude-opus-4.7`.
+  // OpenRouter `<provider>/<model>` id — e.g. `anthropic/claude-sonnet-4`,
+  // `openai/gpt-4o-mini`, `moonshotai/kimi-k2`.
   model: string;
   providerOptions?: ProviderOptions;
   temperature?: number;
   maxTokens?: number;
   spend?: { usd: number };
   costPer1k?: { input: number; output: number };
-  onUsage?: (usage: AiGatewayUsage) => void;
+  onUsage?: (usage: OpenRouterUsage) => void;
   retryOnEmpty?: { maxAttempts: number };
   fetch?: typeof fetch;
+  // Optional attribution headers OpenRouter recognises for the
+  // "rankings" page. Both are harmless if omitted.
+  referer?: string;
+  appName?: string;
 }
 
-export function createAiGatewayInfer(opts: AiGatewayOptions): InferFn {
+export function createOpenRouterInfer(opts: OpenRouterOptions): InferFn {
   const {
     apiKey,
     model,
     providerOptions,
-    // Leave temperature + maxTokens unset by default. Newer OpenAI
-    // models (gpt-5.x) reject any non-default temperature AND reject
-    // `max_tokens` in favor of `max_completion_tokens`.
     temperature,
     maxTokens,
     spend,
     costPer1k = DEFAULT_COST_PER_1K,
     onUsage,
     retryOnEmpty = { maxAttempts: 2 },
+    referer,
+    appName,
   } = opts;
   const maxAttempts = Math.max(1, retryOnEmpty.maxAttempts);
   void maxTokens;
 
-  const gateway = createGateway({
+  const router = createOpenRouter({
     apiKey,
     ...(opts.fetch ? { fetch: opts.fetch } : {}),
+    ...(referer || appName
+      ? {
+          headers: {
+            ...(referer ? { "HTTP-Referer": referer } : {}),
+            ...(appName ? { "X-Title": appName } : {}),
+          },
+        }
+      : {}),
   });
-  const languageModel = gateway(model);
+  const languageModel = router(model);
 
   return async (context): Promise<InferResponse> => {
     const system = systemToString(context.system);
@@ -87,7 +99,6 @@ export function createAiGatewayInfer(opts: AiGatewayOptions): InferFn {
         spend.usd +=
           (nonCachedInput / 1000) * costPer1k.input +
           (cacheRead / 1000) * costPer1k.input * 0.1 +
-          (cacheWrite / 1000) * costPer1k.input * 1.25 +
           (outTok / 1000) * costPer1k.output;
       }
       if (onUsage) {
