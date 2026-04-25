@@ -1,0 +1,22 @@
+{
+  "name": "effectctx-example-cloudflare-sandbox",
+  "private": true,
+  "version": "0.0.0",
+  "description": "effectctx running in a Cloudflare Worker, with shell + filesystem backed by Cloudflare Sandbox.",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@cloudflare/sandbox": "^0.8.9",
+    "effect": "^3.21.1",
+    "effectctx": "file:../.."
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20260301.0",
+    "typescript": "^5.8.3",
+    "wrangler": "^4.0.0"
+  }
+}

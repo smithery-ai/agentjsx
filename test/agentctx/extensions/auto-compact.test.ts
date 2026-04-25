@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { autoCompact, createAgentRuntime } from "effectctx";
+import { compact, createAgentRuntime } from "effectctx";
 import type { Fragment, InferFn } from "effectctx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
-describe("agentctx: autoCompact extension", () => {
+describe("agentctx: compact extension", () => {
   it("the compact tool declares a compaction.summary event appended alongside its tool.result", async () => {
     const summaries: Array<{ blocks: Fragment[]; focusPrompt: string | null }> = [];
     const summarizeFn = async (blocks: Fragment[]): Promise<string> => {
@@ -35,7 +35,7 @@ describe("agentctx: autoCompact extension", () => {
 
     const agent = createAgentRuntime({
       infer,
-      extensions: [autoCompact({ summarize: summarizeFn, tail: 1 })],
+      extensions: [compact({ summarize: summarizeFn, tail: 1 })],
     });
 
     try {
@@ -118,7 +118,7 @@ describe("agentctx: autoCompact extension", () => {
 
     const agent = createAgentRuntime({
       infer,
-      extensions: [autoCompact({ summarize: summarizeFn, tail: 10 })],
+      extensions: [compact({ summarize: summarizeFn, tail: 10 })],
     });
 
     try {
@@ -168,7 +168,7 @@ describe("agentctx: autoCompact extension", () => {
 
     const agent = createAgentRuntime({
       infer,
-      extensions: [autoCompact({ summarize: summarizeFn, tail: 1 })],
+      extensions: [compact({ summarize: summarizeFn, tail: 1 })],
     });
 
     try {

@@ -6,7 +6,7 @@ import { eventToFragment } from "../projections";
 import type { Fragment, ToolOutcome } from "../types";
 import { addToolReporting } from "./tool-registration";
 
-export interface AutoCompactOptions {
+export interface CompactOptions {
   // Produce a prose summary of the slice being compacted.
   readonly summarize: (oldBlocks: Fragment[]) => Promise<string>;
   // Events from the tail stay uncompacted. Default 10.
@@ -29,7 +29,7 @@ export interface AutoCompactOptions {
 // the same event type, the same projection behavior. Stacking works
 // naturally: each call appends one boundary event; the projection
 // collapses all covered ranges.
-export const autoCompact = (opts: AutoCompactOptions): Extension => {
+export const compact = (opts: CompactOptions): Extension => {
   const tail = opts.tail ?? 10;
   const toolName = opts.toolName ?? "compact";
   const description =

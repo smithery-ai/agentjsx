@@ -1,0 +1,19 @@
+{
+  "name": "effectctx-example-coding-agent",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Minimal local coding agent built on effectctx.",
+  "type": "module",
+  "scripts": {
+    "agent": "tsx index.ts"
+  },
+  "dependencies": {
+    "effect": "^3.21.1",
+    "effectctx": "file:../.."
+  },
+  "devDependencies": {
+    "@types/node": "^22.19.17",
+    "tsx": "^4.20.0",
+    "typescript": "^5.8.3"
+  }
+}

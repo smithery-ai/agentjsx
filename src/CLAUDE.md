@@ -23,7 +23,7 @@ Each extension does one thing. A dozen small extensions beat one big one.
 Current surface:
 - `workspace` bundles `shell` + `fileSystem` at one root — but `shell` and `fileSystem` are independent and usable alone.
 - `recall` exposes log-reading; `truncateToolOutputs` rewrites projection; they compose but work independently.
-- `autoCompact` and `summarize` share the `compaction.summary` event type but trigger differently (model-driven vs threshold-driven).
+- `compact` and `summarize` share the `compaction.summary` event type but trigger differently (model-driven vs threshold-driven).
 
 **Why**: small extensions mean users can opt in to exactly what they want. Combining two is the common case. Fork-and-modify is cheap because the surface is narrow.
 
@@ -109,7 +109,7 @@ Canonical example: `truncateToolOutputs` probes for `recall` to decide whether t
 
 **Event contracts are a separate case.**
 
-Two extensions may both emit or consume an event type (`compaction.summary` is emitted by `autoCompact` and `summarize`; consumed by the projection and hidden by `recall`). This is not adaptation — neither extension probes for the other. It's a shared log contract. Document the contract on the event type's definition in `types.ts` so the producers/consumers are discoverable without reading every extension. If the contract demands that both producers be installed together, compose them.
+Two extensions may both emit or consume an event type (`compaction.summary` is emitted by `compact` and `summarize`; consumed by the projection and hidden by `recall`). This is not adaptation — neither extension probes for the other. It's a shared log contract. Document the contract on the event type's definition in `types.ts` so the producers/consumers are discoverable without reading every extension. If the contract demands that both producers be installed together, compose them.
 
 **Why**: extensions stay usable alone. Coupling, where genuine, is named and co-located with its glue. The compile-time extension count matches the runtime behavior surface. Removing an extension has a predictable, local blast radius: at most, a composition breaks — never a hidden branch in an unrelated file.
 

@@ -63,6 +63,14 @@
       "types": "./src/extensions/*.ts",
       "default": "./src/extensions/*.ts"
     },
+    "./node": {
+      "types": "./src/node/index.ts",
+      "default": "./src/node/index.ts"
+    },
+    "./node/*": {
+      "types": "./src/node/*.ts",
+      "default": "./src/node/*.ts"
+    },
     "./hydration": {
       "types": "./src/hydration.ts",
       "default": "./src/hydration.ts"

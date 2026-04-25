@@ -14,7 +14,7 @@ export { createInMemoryStore, type InMemoryStoreOptions } from "./in-memory-stor
 export { shell, type Shell, type ShellOptions, type ExecResult } from "./shell";
 export { workspace, type Workspace, type WorkspaceOptions } from "./workspace";
 export { summarize, SUMMARIZATION_PROMPT, type SummarizeOptions } from "./summarize";
-export { autoCompact, type AutoCompactOptions } from "./auto-compact";
+export { compact, type CompactOptions } from "./auto-compact";
 export { recall, type RecallOptions } from "./recall";
 export {
   truncateToolOutputs,
