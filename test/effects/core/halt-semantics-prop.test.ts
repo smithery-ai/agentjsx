@@ -77,6 +77,13 @@ const buildLog = (shapes: ReadonlyArray<EventInput>): Event[] =>
         };
       case "assistant.halted":
         return { seq: i, type: "assistant.halted", reason: s.reason };
+      case "inference.failed":
+        return {
+          seq: i,
+          type: "inference.failed",
+          cause: s.cause,
+          phase: s.phase,
+        };
       case "compaction.summary":
         return s.prompt !== undefined
           ? {

@@ -205,6 +205,8 @@ const eventContent = (e: Event): string => {
       return e.content;
     case "assistant.halted":
       return `[halted: ${e.reason}]`;
+    case "inference.failed":
+      return `[inference failed: ${e.cause}]`;
     case "compaction.summary":
       return e.text;
     case "tool.call.started":

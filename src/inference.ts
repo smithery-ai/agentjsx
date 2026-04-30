@@ -66,7 +66,28 @@ export const runInference = (
           tool_calls: response.tool_calls,
         });
       }).pipe(
-        Effect.catchAll((err) => ctx.reportError("inference", err)),
+        Effect.catchAll((err) =>
+          // Two-channel surfacing. The structured error still lands on
+          // `ctx.errors` for backwards compat, AND the failure is
+          // appended to the event log as a terminal event so
+          // `agent.until` / projections / hydration replay all see it.
+          // Without the event-log append, an InferFn that throws becomes
+          // a stuck-`running` session: the predicate never gets a
+          // terminal-shaped event to match on, no `assistant.halted`
+          // lands, and the public state is indistinguishable from "still
+          // thinking". This is a real silent-hang failure mode every
+          // integrator currently has to work around.
+          Effect.gen(function* () {
+            const cause =
+              err instanceof Error ? err.message : String(err);
+            yield* ctx.events.append({
+              type: "inference.failed",
+              cause,
+              phase: "inference",
+            });
+            yield* ctx.reportError("inference", err);
+          }),
+        ),
       );
 
     const driver = ctx.events.changes.pipe(

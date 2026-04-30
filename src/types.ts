@@ -80,6 +80,15 @@ export type Event = { seq: number } & (
   | { type: "tool.call.started"; tool_call_id: string; tool_name: string }
   | { type: "tool.result"; tool_call_id: string; content: string }
   | { type: "assistant.halted"; reason: string }
+  // The InferFn threw. Without this event, the inference loop's
+  // `Effect.catchAll` swallows the error into `ctx.errors` (an internal
+  // channel) and any `agent.until` predicate keeps waiting forever — a
+  // real silent-hang failure mode. With this, the loop is terminal:
+  // predicates can match it, the runtime can decide retry/halt, and
+  // consumers see a real failure instead of a stuck-`running` session.
+  // `cause` is the unwrapped error message; the full structured error
+  // is also pushed to `ctx.errors` for stack-trace access.
+  | { type: "inference.failed"; cause: string; phase: string }
   // Additive compaction boundary. Declares that events in [fromSeq, toSeq]
   // are summarized by `text`. The projection collapses the covered range
   // into a single system block at render time; the underlying events are

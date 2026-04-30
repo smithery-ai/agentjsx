@@ -63,6 +63,7 @@ export const EVENT_META: { readonly [K in Event["type"]]: EventMeta } = {
   "tool.call.started":  { projectable: false, hiddenByRecall: true,  structural: false },
   "tool.result":        { projectable: true,  hiddenByRecall: false, structural: false },
   "assistant.halted":   { projectable: true,  hiddenByRecall: false, structural: false },
+  "inference.failed":   { projectable: true,  hiddenByRecall: false, structural: false },
   "compaction.summary": { projectable: false, hiddenByRecall: true,  structural: true  },
 };
 
@@ -93,6 +94,16 @@ const PROJECTORS: ProjectorTable = {
   "assistant.halted": (e) => ({
     tag: "core/assistant-message",
     content: `[stopped: ${e.reason}]`,
+    eventSeq: e.seq,
+    source: "history",
+  }),
+  // Surfaced into the LLM-facing block stream so a follow-up turn (if
+  // the user re-sends) can see why the previous one died. Renders as a
+  // bracketed assistant message; consumers writing custom projections
+  // can switch on `tag` if they want a different shape.
+  "inference.failed": (e) => ({
+    tag: "core/assistant-message",
+    content: `[inference failed: ${e.cause}]`,
     eventSeq: e.seq,
     source: "history",
   }),
@@ -248,6 +259,10 @@ export function isHalted(events: Chunk.Chunk<Event>): boolean {
     const e = arr[i];
     if (e.type === "user.message") return false;
     if (e.type === "assistant.halted") return true;
+    // `inference.failed` is also terminal within a turn — the
+    // inference loop rejected (and we appended this); no further
+    // assistant work happens until the user re-sends.
+    if (e.type === "inference.failed") return true;
   }
   return false;
 }
