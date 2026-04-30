@@ -68,6 +68,85 @@ describe("agentctx: inference.failed event surfacing", () => {
     }
   });
 
+  it("default validate catches an empty-assistant context as inference.failed", async () => {
+    // Seed a degenerate assistant message into the log. When the next
+    // user message triggers inference, preflight should reject the
+    // composed context BEFORE the wire call — turning what would
+    // otherwise be a generic upstream 4xx into a clean local diagnostic.
+    const agent = createAgentRuntime({
+      infer: async () => ({ content: "should-not-fire" }),
+      initialEvents: [
+        { seq: 0, type: "user.message", content: "earlier" },
+        { seq: 1, type: "assistant.message", content: "" },
+      ],
+    });
+    try {
+      await agent.send("now");
+      const result = await Promise.race([
+        agent.until((s) => {
+          const last = s.events.at(-1);
+          if (last?.type === "inference.failed")
+            return { failed: last.cause };
+          return null;
+        }),
+        new Promise<{ timeout: true }>((resolve) =>
+          setTimeout(() => resolve({ timeout: true }), 2000),
+        ),
+      ]);
+      expect(result).toMatchObject({
+        failed: expect.stringContaining("preflight"),
+      });
+    } finally {
+      await agent.dispose();
+    }
+  });
+
+  it("validate: null disables preflight", async () => {
+    const agent = createAgentRuntime({
+      validate: null,
+      infer: async () => ({ content: "" }), // would normally fail preflight
+    });
+    try {
+      await agent.send("hi");
+      // With preflight off, the empty assistant.message lands without
+      // triggering inference.failed. Wait briefly to confirm.
+      await new Promise((r) => setTimeout(r, 200));
+      const events = await agent.events();
+      expect(events.some((e) => e.type === "inference.failed")).toBe(false);
+      expect(events.some((e) => e.type === "assistant.message")).toBe(true);
+    } finally {
+      await agent.dispose();
+    }
+  });
+
+  it("validate: custom function overrides the default", async () => {
+    let validatorCalls = 0;
+    const agent = createAgentRuntime({
+      validate: () => {
+        validatorCalls++;
+        return validatorCalls === 1 ? "custom: nope" : null;
+      },
+      infer: async () => ({ content: "fine" }),
+    });
+    try {
+      await agent.send("hi");
+      const result = await Promise.race([
+        agent.until((s) => {
+          const last = s.events.at(-1);
+          return last?.type === "inference.failed" ? { failed: last.cause } : null;
+        }),
+        new Promise<{ timeout: true }>((resolve) =>
+          setTimeout(() => resolve({ timeout: true }), 2000),
+        ),
+      ]);
+      expect(result).toMatchObject({
+        failed: expect.stringContaining("custom: nope"),
+      });
+    } finally {
+      await agent.dispose();
+    }
+  });
+
   it("inference resumes on the next user message after a failure", async () => {
     let attempt = 0;
     const agent = createAgentRuntime({

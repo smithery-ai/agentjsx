@@ -9,6 +9,7 @@ import {
 } from "effect";
 import { AgentCtx, type AgentErrorEntry, type Renderer } from "./agent-ctx";
 import { runInference } from "./inference";
+import { validateProviderContext } from "./validate";
 import { PendingSends } from "./pending-sends";
 import { isHalted, lastResult, pendingToolCallsFromLog, toolsInFlight } from "./projections";
 import { runToolExecution } from "./tool-exec";
@@ -38,6 +39,17 @@ export interface AgentOptions {
   // from `@flamecast/harness/jsx`) is one way to build one; any pure
   // function is equally valid.
   readonly renderer?: Renderer;
+  // Render preflight. Invoked just before each inference call with the
+  // composed ProviderContext. Returning a string aborts the call: the
+  // string is treated as a diagnostic and surfaces as `inference.failed`
+  // (so consumers using `agent.until` see it as a terminal event).
+  // Returning null lets the call through.
+  //
+  // Defaults to `validateProviderContext`, which catches
+  // empty-assistant-turn shapes that Anthropic / Google / Bedrock reject.
+  // Pass `null` to disable (e.g. OpenAI-only callers that tolerate
+  // empty-content stop turns).
+  readonly validate?: ((ctx: ProviderContext) => string | null) | null;
 }
 
 // Snapshot view passed into `until` predicates. Plain arrays so
@@ -105,7 +117,17 @@ export const createAgent = (
       yield* Layer.build(ext);
     }
 
-    yield* runInference(opts.infer);
+    yield* runInference(opts.infer, {
+      // Caller-supplied validator wins; explicit `null` opts out of
+      // preflight entirely; absent → default to the canonical empty-
+      // assistant guard. The default is conservative-correct for
+      // Anthropic / Google / Bedrock; OpenAI-only callers can pass
+      // `null` if they prefer to forward empty-content stop turns.
+      validate:
+        opts.validate === null
+          ? null
+          : opts.validate ?? validateProviderContext,
+    });
     yield* runToolExecution();
 
     return ctx;

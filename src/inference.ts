@@ -2,8 +2,14 @@ import { Chunk, Effect, type Fiber, Runtime, type Scope, Stream } from "effect";
 import { AgentCtx } from "./agent-ctx";
 import { InferenceError } from "./errors";
 import { isHalted, toolsInFlight } from "./projections";
-import type { Event, InferFn, InferOptions } from "./types";
-import { validateProviderContext } from "./validate";
+import type { Event, InferFn, InferOptions, ProviderContext } from "./types";
+
+export interface RunInferenceOptions {
+  // Render preflight invoked just before each inference call. Returning
+  // a string aborts the call (the string surfaces as `inference.failed`).
+  // Returning null lets the call through. `null` to disable preflight.
+  readonly validate?: ((ctx: ProviderContext) => string | null) | null;
+}
 
 // Inference loop. Subscribes to the event log; for every new log state
 // where the last event is `user.message` or `tool.result` AND the log
@@ -17,8 +23,10 @@ import { validateProviderContext } from "./validate";
 // must reflect the halt as the final state. See signals/graph.ts:321-322.
 export const runInference = (
   infer: InferFn,
+  opts: RunInferenceOptions = {},
 ): Effect.Effect<Fiber.RuntimeFiber<void, never>, never, AgentCtx | Scope.Scope> =>
   Effect.gen(function* () {
+    const validate = opts.validate ?? null;
     const ctx = yield* AgentCtx;
 
     const step = (events: Chunk.Chunk<Event>): Effect.Effect<void> =>
@@ -42,22 +50,20 @@ export const runInference = (
         // inference-consistency.test.ts for the failure mode.
         const context = yield* ctx.render;
 
-        // Render preflight: catch shape bugs (empty assistant turns,
-        // dangling tool messages) BEFORE the wire call. Without this,
-        // every integrator's `inferFn` has to defend against the same
-        // class of upstream rejections on its own — and historically
-        // most haven't, surfacing as a generic 4xx that bubbles up as
-        // an `inference.failed` with the upstream's terse message
-        // instead of one pointing at the offending log entry. This
-        // shifts diagnosis from "what did the provider not like?" to
-        // "which event in MY log is malformed?".
-        const validationError = validateProviderContext(context);
-        if (validationError) {
-          return yield* Effect.fail(
-            new InferenceError({
-              cause: new Error(`preflight: ${validationError}`),
-            }),
-          );
+        // Render preflight (opt-in). Catches shape bugs at the source
+        // — pointing at the offending log entry — instead of letting
+        // upstream return a generic 4xx. Caller-supplied via
+        // `createAgentRuntime({ validate })`; defaults to
+        // `validateProviderContext`. Pass `null` to skip.
+        if (validate) {
+          const validationError = validate(context);
+          if (validationError) {
+            return yield* Effect.fail(
+              new InferenceError({
+                cause: new Error(`preflight: ${validationError}`),
+              }),
+            );
+          }
         }
 
         const runtime = yield* Effect.runtime<never>();
