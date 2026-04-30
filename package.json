@@ -106,6 +106,10 @@
     "./types": {
       "types": "./src/types.ts",
       "default": "./src/types.ts"
+    },
+    "./validate": {
+      "types": "./src/validate.ts",
+      "default": "./src/validate.ts"
     }
   },
   "scripts": {

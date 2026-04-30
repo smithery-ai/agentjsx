@@ -134,3 +134,7 @@ export function mapToolCalls(
     },
   }));
 }
+
+// Re-export from core so providers can keep using the canonical name
+// `validateProviderContext` without reaching across the package.
+export { validateProviderContext } from "../validate";
