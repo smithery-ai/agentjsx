@@ -9,3 +9,5 @@ export { Skills } from "./skills";
 export { Compact } from "./compact";
 export { McpServer } from "./mcp";
 export { Subagent } from "./subagent";
+export { Memory } from "./memory";
+export { WebSearch, WebFetch } from "./web";

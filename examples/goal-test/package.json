@@ -1,0 +1,20 @@
+{
+	"name": "agentjsx-example-goal-test",
+	"private": true,
+	"version": "0.0.0",
+	"description": "Userspace emulation of Claude Code's /goal: re-prompt the agent until an independent judge says the condition is met.",
+	"type": "module",
+	"scripts": {
+		"start": "tsx cli.tsx"
+	},
+	"dependencies": {
+		"@effect/platform-node": "^0.106.0",
+		"@flamecast/agentjsx": "file:../..",
+		"effect": "^3.21.1"
+	},
+	"devDependencies": {
+		"@types/node": "^22.19.17",
+		"tsx": "^4.20.0",
+		"typescript": "^5.8.3"
+	}
+}

@@ -56,6 +56,14 @@ A component is a function that returns one or more emits. Three shapes:
 - **Capability** — emits tools and optionally a fragment describing them (`<Workspace>`, `<Subagent>`).
 - **Shaper** — wraps children and transforms what they emit (`<Compact>`).
 
+Built-in capability components include `<Workspace>`, `<Skills>`, `<McpServer>`, `<Subagent>`, `<Todo>`, `<Memory>`, `<WebSearch>`, `<WebFetch>`. Drop any of them inside `<Agent>`:
+
+```tsx
+<Memory root="./.memory" />
+<WebSearch apiKey={process.env.EXA_API_KEY!} />
+<WebFetch />
+```
+
 A minimal capability:
 
 ```tsx

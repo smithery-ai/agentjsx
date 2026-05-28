@@ -1,6 +1,53 @@
 import { useCallback, useState } from "react"
 import { HeroCodeBlock } from "./HeroCodeBlock"
 import { CODE } from "./InteractiveContextHero"
+import agentjsxSkill from "../../skills/agentjsx/SKILL.md?raw"
+
+const COPY_PROMPT = `I want to build a coding agent using @flamecast/agentjsx. Read the skill below to understand the library, then scaffold a minimal agent for me. Ask me what tools and capabilities I want before writing code.
+
+---
+
+${agentjsxSkill}`
+
+const COMPONENT_CODE = `import { render } from "@flamecast/agentjsx"
+import {
+  Agent, Messages, emitFragment, emitHaltPredicate,
+} from "@flamecast/agentjsx/components"
+
+// Claude-Code-style /goal. The agent can't call a "done" tool — it
+// doesn't have one. Halting is gated by an independent inference call
+// that judges the transcript against the condition. The model sees
+// the goal in its system block, but completion is decided externally.
+function Goal({ condition }: { condition: string }) {
+  return [
+    emitFragment({
+      tag: "core/system",
+      source: "goal",
+      content: \`<goal>\${condition}</goal>\\n(stopping is blocked until this holds)\`,
+    }),
+    emitHaltPredicate(async ({ events, infer }) => {
+      const transcript = events
+        .filter(e => e.type === "user.message" || e.type === "assistant.message")
+        .map(e => \`[\${e.type}] \${"content" in e ? e.content : ""}\`)
+        .join("\\n")
+      const res = await infer({
+        system: \`Judge whether this condition holds: "\${condition}".
+          Reply with JSON {"ok": boolean, "reason": string}.\`,
+        messages: [{ role: "user", content: transcript }],
+        tools: [],
+      })
+      return JSON.parse(res.content)
+    }),
+  ]
+}
+
+// Drop it in like any built-in component:
+render(
+  <Agent>
+    <Goal condition="every TODO has a Linear ticket" />
+    <Messages />
+  </Agent>
+)`
 
 function LandingHeader() {
 	return (
@@ -8,17 +55,14 @@ function LandingHeader() {
 			<a className="brand" href="/">
 				agentctx
 			</a>
-			<a className="landing-cta" href="#docs">
-				Docs
-			</a>
 		</header>
 	)
 }
 
-function CopySnippetCta() {
+function CopyPromptCta() {
 	const [copied, setCopied] = useState(false)
 	const handleCopy = useCallback(() => {
-		navigator.clipboard.writeText(CODE).then(() => {
+		navigator.clipboard.writeText(COPY_PROMPT).then(() => {
 			setCopied(true)
 			setTimeout(() => setCopied(false), 2000)
 		})
@@ -26,7 +70,7 @@ function CopySnippetCta() {
 
 	return (
 		<button type="button" className="cta-primary" onClick={handleCopy}>
-			{copied ? "Copied" : "Copy snippet"}
+			{copied ? "Copied" : "Copy prompt"}
 		</button>
 	)
 }
@@ -37,16 +81,6 @@ const LINKS = [
 		label: "GitHub",
 		desc: "Source, issues, and the full extension catalog.",
 	},
-	{
-		href: "https://www.npmjs.com/package/@flamecast/agentjsx",
-		label: "npm",
-		desc: "Install with bun add @flamecast/agentjsx.",
-	},
-	{
-		href: "https://github.com/smithery-ai/agentjsx/tree/main/examples",
-		label: "Examples",
-		desc: "Local coding agent and Cloudflare Sandbox variants.",
-	},
 ]
 
 export function Landing() {
@@ -56,16 +90,18 @@ export function Landing() {
 			<main className="landing-main">
 				<div className="landing-hero">
 					<div className="landing-hero-text">
-						<h1>Render your agent's context like a UI</h1>
+						<h1>
+							Write your own Claude Code.
+							<br />
+							Run it anywhere.
+						</h1>
 						<p className="lede">
-							Event log to JSX to context. agentctx is an
-							Effect-based agent harness that treats LLM context
-							like React treats the DOM: composable steering
-							extensions shape what your model sees and does, and
-							the same code runs anywhere V8 does.
+							A runtime agnostic agent harness framework. Compose
+							your agent from reusable JSX components, then run it
+							anywhere V8 does: Node, Bun, or a browser tab.
 						</p>
 						<div className="landing-hero-cta">
-							<CopySnippetCta />
+							<CopyPromptCta />
 							<a
 								className="cta-secondary"
 								href="https://github.com/smithery-ai/agentjsx"
@@ -79,6 +115,30 @@ export function Landing() {
 				<div className="landing-section landing-code-section">
 					<HeroCodeBlock code={CODE} filename="agent.tsx" />
 				</div>
+
+				<section
+					className="landing-section landing-build-section"
+					aria-labelledby="section-build"
+				>
+					<div className="landing-build-text">
+						<h2 id="section-build" className="landing-build-heading">
+							Build your own components.
+						</h2>
+						<p className="landing-build-lede">
+							Components are functions that contribute tools,
+							prompt content, or both. Some wrap others to
+							reshape what they produce. Drop them inside{" "}
+							<code>{"<Agent>"}</code>; the runtime handles
+							diffing and tool reconciliation between renders.
+						</p>
+					</div>
+					<div className="landing-code-section">
+						<HeroCodeBlock
+							code={COMPONENT_CODE}
+							filename="goal.tsx"
+						/>
+					</div>
+				</section>
 
 				<section
 					className="landing-section"
