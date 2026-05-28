@@ -22,6 +22,7 @@ export {
 export { PendingSends, type PendingSendsService } from "./core/pending-sends";
 export { runInference } from "./core/inference";
 export { runToolExecution } from "./core/tool-exec";
+export { runHaltGate } from "./core/halt-gate";
 export {
   isHalted,
   lastResult,

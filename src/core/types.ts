@@ -166,13 +166,15 @@ export type Fragment = {
 }[keyof FragmentMap];
 
 // Output of the JSX render walk (see `src/jsx/render.ts`). Components
-// emit into one of these channels via `emitFragment` / `emitTool`. The
-// runtime consumes a `Rendered` to seed `ctx.ambients` and `ctx.tools`
-// at startup. Additional channels (transforms, forked effects) are
-// reserved for future stages — not implemented yet.
+// emit into one of these channels via `emitFragment` / `emitTool` /
+// `emitCommand`. The runtime consumes a `Rendered` to seed
+// `ctx.ambients`, `ctx.tools`, and slash commands at startup.
+// Additional channels (transforms, forked effects) are reserved for
+// future stages — not implemented yet.
 export interface Rendered {
   readonly fragments: ReadonlyArray<Fragment>;
   readonly tools: ReadonlyArray<Tool>;
+  readonly commands: ReadonlyArray<import("../jsx/runtime").Command>;
 }
 
 export interface InferResponse {

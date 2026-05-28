@@ -24,6 +24,7 @@ import type {
   TextDelta,
   Tool,
 } from "./types";
+import type { Command, HaltPredicate } from "../jsx/runtime";
 
 const TEXT_DELTA_CAPACITY = 256;
 
@@ -135,6 +136,25 @@ export interface AgentCtxService {
   // subscribed to `events.changes` — those must call `render` (below)
   // to avoid the FRP glitch.
   readonly rendered: SubscriptionRef.SubscriptionRef<ProviderContext>;
+  // Commands emitted by the current JSX projection. Populated each
+  // render pass from `Rendered.commands`. The slash-command router in
+  // `agent.run` reads this to dispatch `/<name> ...` inputs to a
+  // registered handler. Empty when no `contextFn` is configured or no
+  // `emitCommand` appears in the tree.
+  readonly commands: SubscriptionRef.SubscriptionRef<ReadonlyArray<Command>>;
+  // Halt-predicate registry, written by command handlers via their
+  // CommandRuntime. SubscriptionRef rather than plain Ref because future
+  // consumers (UI surfacing active goals, the halt-gate fiber in a
+  // follow-up PR) will subscribe to changes.
+  readonly haltPredicates: SubscriptionRef.SubscriptionRef<
+    ReadonlyMap<string, HaltPredicate>
+  >;
+  readonly registerHaltPredicate: (
+    name: string,
+    fn: HaltPredicate,
+  ) => Effect.Effect<void>;
+  readonly clearHaltPredicate: (name: string) => Effect.Effect<void>;
+  readonly getHaltPredicates: Effect.Effect<ReadonlyMap<string, HaltPredicate>>;
   // Synchronous render from primary sources (events + ambients +
   // transforms + tools). Runs the shaper chain AND the terminal
   // adapter, so the result is the same ProviderContext shape the
@@ -196,6 +216,10 @@ export const make = (
       tools: [],
     };
     const rendered = yield* SubscriptionRef.make<ProviderContext>(emptyContext);
+    const commands = yield* SubscriptionRef.make<ReadonlyArray<Command>>([]);
+    const haltPredicates = yield* SubscriptionRef.make<
+      ReadonlyMap<string, HaltPredicate>
+    >(new Map());
     // Explicit re-render trigger for extension-owned reactive state.
     // Bumped by `invalidate`; merged into the render driver below.
     const invalidateRef = yield* SubscriptionRef.make(0);
@@ -377,9 +401,10 @@ export const make = (
           rendered = renderedExit.value;
         } else {
           yield* reportError("context", renderedExit.error);
-          rendered = { fragments: [], tools: [] };
+          rendered = { fragments: [], tools: [], commands: [] };
         }
         yield* reconcileContextTools(rendered.tools);
+        yield* SubscriptionRef.set(commands, [...rendered.commands]);
         fragments = [...rendered.fragments];
       } else if (renderer) {
         const eventsArr = Chunk.toReadonlyArray(currentEvents);
@@ -455,6 +480,27 @@ export const make = (
       (n) => n + 1,
     );
 
+    const registerHaltPredicate = (
+      name: string,
+      fn: HaltPredicate,
+    ): Effect.Effect<void> =>
+      SubscriptionRef.update(haltPredicates, (current) => {
+        const next = new Map(current);
+        next.set(name, fn);
+        return next;
+      });
+    const clearHaltPredicate = (name: string): Effect.Effect<void> =>
+      SubscriptionRef.update(haltPredicates, (current) => {
+        if (!current.has(name)) return current;
+        const next = new Map(current);
+        next.delete(name);
+        return next;
+      });
+    const getHaltPredicates: Effect.Effect<ReadonlyMap<string, HaltPredicate>> =
+      SubscriptionRef.get(haltPredicates).pipe(
+        Effect.map((m) => new Map(m) as ReadonlyMap<string, HaltPredicate>),
+      );
+
     const deltasHub = yield* PubSub.sliding<TextDelta>(TEXT_DELTA_CAPACITY);
     const textDeltas: Stream.Stream<TextDelta> = Stream.fromPubSub(deltasHub);
     const emitTextDelta = (delta: TextDelta): Effect.Effect<void> =>
@@ -467,6 +513,11 @@ export const make = (
       transforms,
       errors,
       rendered,
+      commands,
+      haltPredicates,
+      registerHaltPredicate,
+      clearHaltPredicate,
+      getHaltPredicates,
       render,
       addTool,
       addAmbient,
