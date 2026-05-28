@@ -105,6 +105,15 @@ export interface AgentCtxOptions {
   // `Rendered`, reconciles its tool list against the previous render's
   // tools (by name), and uses its fragments as the pre-transform stream.
   readonly context?: () => Rendered;
+  // Runner that executes Effects against the enclosing agent runtime.
+  // Threaded through to the render() ambient RenderContext so capability
+  // components can call platform services from inside Tool.run bodies.
+  // Injected by `createAgentRuntime` after the runtime is constructed
+  // (chicken-and-egg: AgentCtx is built by the runtime, but the runtime
+  // is the thing that supplies the runner). Until the runtime swaps in
+  // the real runner, calls throw — render() walks during construction
+  // shouldn't be invoking it, so the placeholder is a fine fallback.
+  readonly runEffect?: <A, E>(eff: Effect.Effect<A, E, never>) => Promise<A>;
 }
 
 export interface AgentCtxService {
@@ -185,6 +194,16 @@ export const make = (
     const invalidateRef = yield* SubscriptionRef.make(0);
     const renderer = opts.renderer;
     const contextFn = opts.context;
+    // Default to a placeholder that throws — `createAgentRuntime`
+    // overrides this with `runtime.runPromise` once the runtime exists.
+    const runEffect =
+      opts.runEffect ??
+      (<A, E>(_eff: Effect.Effect<A, E, never>): Promise<A> =>
+        Promise.reject(
+          new Error(
+            "AgentCtx.runEffect invoked before the runtime was wired. This indicates the AgentCtx was built without `createAgentRuntime`.",
+          ),
+        ));
 
     // Per-tool sub-scopes for JSX context tool reconciliation. Keyed by
     // tool name (not reference) — same name across renders = same tool,
@@ -326,7 +345,7 @@ export const make = (
         // catch the throw and surface it via reportError so the render
         // fiber stays alive.
         const renderedExit = yield* Effect.sync(() => {
-          _setExternalContext({ events: eventsArr });
+          _setExternalContext({ events: eventsArr, runEffect });
           try {
             return { ok: true as const, value: contextFn() };
           } catch (err) {

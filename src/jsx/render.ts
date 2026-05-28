@@ -6,6 +6,7 @@
 // in the JSX-context API is a function component. Throwing on
 // intrinsics keeps the contract narrow and the failure mode obvious.
 
+import type { Effect } from "effect";
 import type { Event, Fragment as RenderedFragment, Rendered, Tool } from "../types";
 import {
   type ComponentFunction,
@@ -25,7 +26,27 @@ interface RenderCollector {
 // will be added as their consuming components ship.
 export interface RenderContext {
   readonly events: ReadonlyArray<Event>;
+  // Run an Effect against the agent's ManagedRuntime. Capability
+  // components use this to call platform services (FileSystem, Path,
+  // CommandExecutor) inside Tool.run callbacks. From the caller's
+  // perspective the Effect's `R` channel is `never` — the runtime has
+  // already provided the platform layer the user passed via
+  // `AgentOptions.platform`. If no platform layer is configured, the
+  // Effect can still run; capability components that require platform
+  // services will fail at use time with a service-not-found error.
+  readonly runEffect: <A, E>(eff: Effect.Effect<A, E, never>) => Promise<A>;
 }
+
+// Default runEffect used when render() is invoked outside the agent
+// runtime (e.g. ad-hoc tests, examples). Throws on use so it's obvious
+// that platform-backed components require the runtime to inject one.
+const defaultRunEffect = <A, E>(_eff: Effect.Effect<A, E, never>): Promise<A> => {
+  return Promise.reject(
+    new Error(
+      "runEffect called outside an agent runtime. Wire `createAgentRuntime` with `platform` and render via the agent's `context` callback.",
+    ),
+  );
+};
 
 let currentContext: RenderContext | null = null;
 // External context, set by the runtime around a user-supplied
@@ -58,12 +79,37 @@ export function render(root: Node, context?: RenderContext): Rendered {
   // Precedence: explicit `context` arg wins (callers that thread their
   // own state stay in control), otherwise pick up the runtime-injected
   // external context, otherwise default to an empty events context.
-  currentContext = context ?? externalContext ?? { events: [] };
+  currentContext =
+    context ??
+    externalContext ?? { events: [], runEffect: defaultRunEffect };
   try {
     walk(root, collector);
   } finally {
     currentContext = previous;
   }
+  return { fragments: collector.fragments, tools: collector.tools };
+}
+
+// Walk a child subtree into a fresh local collector and return the
+// captured Rendered. Used by wrapping components (e.g. <Compact>) that
+// need to inspect what their children would have emitted, transform it,
+// and re-emit a derived value to the outer collector.
+//
+// Emits captured here do NOT bubble to the outer walker — that's the
+// whole point. The wrapping component decides what (if anything) to
+// emit into the outer collector via emitFragment/emitTool on its own
+// return value. The ambient RenderContext (events, runEffect) is the
+// same one the outer walker is using; useRenderContext() inside the
+// children works exactly as before.
+//
+// Nesting is safe: each renderChildren call has its own collector
+// variable. There's no module-level collector "stack" to manage because
+// the existing walker already takes its collector as an explicit
+// argument — see walk() below.
+export function renderChildren(children: Node | ReadonlyArray<Node>): Rendered {
+  const collector: RenderCollector = { fragments: [], tools: [] };
+  // Array case is just a Node per the Node union; walk handles both.
+  walk(children as Node, collector);
   return { fragments: collector.fragments, tools: collector.tools };
 }
 

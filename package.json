@@ -136,14 +136,20 @@
     "effect": "^3.21.1"
   },
   "peerDependencies": {
+    "@effect/platform": "^0.96.1",
     "@modelcontextprotocol/sdk": "^1.25.1"
   },
   "peerDependenciesMeta": {
     "@modelcontextprotocol/sdk": {
       "optional": true
+    },
+    "@effect/platform": {
+      "optional": true
     }
   },
   "devDependencies": {
+    "@effect/platform": "^0.96.1",
+    "@effect/platform-node": "^0.106.0",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "@types/node": "^22.19.17",
     "fast-check": "^4.7.0",

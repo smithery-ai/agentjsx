@@ -116,7 +116,10 @@ describe("jsx end-to-end", () => {
       // ---- Assertion 3: workspace placeholder block landed.
       expect(sys1).toContain('<workspace root="./">');
 
-      // ---- Assertion 4: the tool actually ran with placeholder output.
+      // ---- Assertion 4: the tool actually ran. Without an
+      // `opts.platform` layer wired to this runtime, FileSystem is
+      // unresolved and the tool returns its caught-error string. The
+      // real-platform e2e lives in stage 4.
       const events = await agent.events();
       const toolResult = events.find(
         (e) => e.type === "tool.result" && e.tool_call_id === "call_1",
@@ -125,8 +128,10 @@ describe("jsx end-to-end", () => {
       expect(toolResult).toMatchObject({
         type: "tool.result",
         tool_call_id: "call_1",
-        content: "[list_dir] would have listed: ./",
       });
+      expect(
+        (toolResult as Extract<Event, { type: "tool.result" }>).content,
+      ).toMatch(/^\[list_dir\] Error: /);
 
       // Confirm infer saw the list_dir tool in its declared toolset on turn 1.
       const declaredOnTurn1 = firstCtx!.tools.map((t) => t.name);

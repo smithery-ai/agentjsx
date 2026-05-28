@@ -7,48 +7,29 @@
 // or under Infisical (Smithery contributors):
 //
 //   infisical run --silent -- npx tsx cli.tsx
+//
+// The program is wrapped in `NodeRuntime.runMain`, which owns SIGINT/SIGTERM
+// handling and closes the scope (running finalizers) on shutdown. The
+// agentjsx public API stays Promise-based; we bridge with `Effect.promise`
+// / `Effect.tryPromise`.
 
+import { NodeContext, NodeRuntime } from "@effect/platform-node"
 import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
-import { Agent, Block, Workspace, Messages } from "@flamecast/agentjsx/components"
-import { createInterface } from "node:readline/promises"
+import { Agent, Block, Messages, Todo, Workspace } from "@flamecast/agentjsx/components"
+import { Console, Effect } from "effect"
+import { createInterface, type Interface as ReadlineInterface } from "node:readline/promises"
 
 const DIM = (s: string) => `\x1b[2m${s}\x1b[0m`
 const BLUE = (s: string) => `\x1b[34m${s}\x1b[0m`
 const GREEN = (s: string) => `\x1b[32m${s}\x1b[0m`
 const YELLOW = (s: string) => `\x1b[33m${s}\x1b[0m`
 
-const apiKey = process.env.AI_GATEWAY_API_KEY
-if (!apiKey) {
-	console.error("Set AI_GATEWAY_API_KEY (or run under `infisical run --silent`).")
-	process.exit(1)
-}
+type AgentRuntime = ReturnType<typeof createAgentRuntime>
 
-const agent = createAgentRuntime({
-	infer: createAiGatewayInfer({ apiKey, model: "anthropic/claude-sonnet-4-6" }),
-	context: () => render(
-		<Agent>
-			<Block name="role">You are a helpful coding assistant. Be concise. Use tools when the user asks about files.</Block>
-			<Workspace root="./" />
-			<Messages />
-		</Agent>
-	),
-})
-
-const rl = createInterface({ input: process.stdin, output: process.stdout })
-
-console.log(DIM(`agentjsx REPL  ·  ctrl-c to exit\n`))
-
-let shuttingDown = false
-const shutdown = async () => {
-	if (shuttingDown) return
-	shuttingDown = true
-	rl.close()
-	await agent.dispose()
-	process.exit(0)
-}
-process.on("SIGINT", shutdown)
-
-async function turn(input: string): Promise<void> {
+// Polling helper. Kept as a plain async function — converting the
+// event-drain loop into pure Effect would double its size for no real
+// readability win.
+async function turn(agent: AgentRuntime, input: string): Promise<void> {
 	const startLen = (await agent.events()).length
 	await agent.send(input)
 
@@ -88,14 +69,58 @@ async function turn(input: string): Promise<void> {
 	}
 }
 
-try {
-	while (true) {
-		const input = (await rl.question(`${BLUE("you")}    `)).trim()
-		if (!input) continue
-		await turn(input)
-		console.log()
+const program = Effect.gen(function* () {
+	const apiKey = process.env.AI_GATEWAY_API_KEY
+	if (!apiKey) {
+		return yield* Effect.die(
+			new Error("Set AI_GATEWAY_API_KEY (or run under `infisical run --silent`)."),
+		)
 	}
-} catch (err) {
-	if (!shuttingDown) console.error(err)
-	await shutdown()
-}
+
+	const agent: AgentRuntime = createAgentRuntime({
+		infer: createAiGatewayInfer({ apiKey, model: "anthropic/claude-sonnet-4-6" }),
+		platform: NodeContext.layer,
+		context: () =>
+			render(
+				<Agent>
+					<Block name="role">
+						You are a helpful coding assistant working in the current directory. Use
+						tools to inspect and modify files. Track multi-step work as todos.
+					</Block>
+					<Workspace root="./" />
+					<Todo />
+					<Messages />
+				</Agent>,
+			),
+	})
+
+	// Finalizers run when the scope closes — i.e. when NodeRuntime.runMain
+	// catches SIGINT/SIGTERM, when the program returns, or when it dies.
+	yield* Effect.addFinalizer(() => Effect.promise(() => agent.dispose()))
+
+	const rl: ReadlineInterface = createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	})
+	yield* Effect.addFinalizer(() => Effect.sync(() => rl.close()))
+
+	yield* Console.log(DIM("agentjsx REPL  ·  ctrl-c to exit") + "\n")
+
+	while (true) {
+		// On SIGINT, NodeRuntime closes stdin and readline rejects with
+		// ERR_USE_AFTER_CLOSE. Catch it as a clean exit sentinel rather than
+		// letting it propagate as a program failure.
+		const raw = yield* Effect.tryPromise({
+			try: () => rl.question(`${BLUE("you")}    `),
+			catch: () => "__exit__" as const,
+		})
+		const input = raw.trim()
+		if (input === "__exit__") return
+		if (!input) continue
+
+		yield* Effect.promise(() => turn(agent, input))
+		yield* Console.log("")
+	}
+}).pipe(Effect.scoped)
+
+NodeRuntime.runMain(program)

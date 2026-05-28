@@ -65,6 +65,20 @@ export interface AgentOptions {
   // rate-limited backends, the filesystem, or subprocess-spawning tools
   // can stampede. Default 8. Pass `"unbounded"` to opt out.
   readonly toolConcurrency?: number | "unbounded";
+  // Layer providing host services (typically `@effect/platform`'s
+  // FileSystem, Path, CommandExecutor). Required when capability
+  // components like <Workspace> are used — those reach for these
+  // services via `RenderContext.runEffect`. In Node, pass
+  // `NodeContext.layer` from `@effect/platform-node`. Cross-runtime
+  // libraries should expose their own composition.
+  //
+  // Typed broadly (output: any): the runtime doesn't know what
+  // services the caller composes in. Capability components that
+  // require a specific service fail at use site if it isn't provided,
+  // not at composition time. When `platform` is undefined the runtime
+  // builds as before — only no platform services are available.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  readonly platform?: Layer.Layer<any, never, never>;
 }
 
 // Snapshot view passed into `until` predicates. Plain arrays so
@@ -164,23 +178,71 @@ const agentLayer = (
 // and returns a plain-object Agent. Mirrors the signals `createAgent`
 // call shape.
 export const createAgentRuntime = (opts: AgentOptions): Agent => {
+  // Chicken-and-egg: AgentCtx is built by the ManagedRuntime, but the
+  // RenderContext that AgentCtx hands to user `context()` callbacks
+  // needs `runtime.runPromise` so capability components can run
+  // platform-backed Effects. Resolve via a mutable holder: pass a
+  // forwarder into AgentCtxOptions, swap in the real runner once the
+  // runtime exists. Render() doesn't fire until extensions install (in
+  // the agent layer), which is after the runtime is constructed — so
+  // by the time anything calls runEffect, the real binding is in place.
+  let runEffectRef: <A, E>(eff: Effect.Effect<A, E, never>) => Promise<A> = <
+    A,
+    E,
+  >(
+    _eff: Effect.Effect<A, E, never>,
+  ): Promise<A> =>
+    Promise.reject(
+      new Error(
+        "Agent runEffect invoked before the runtime finished constructing.",
+      ),
+    );
+  const runEffect = <A, E>(eff: Effect.Effect<A, E, never>): Promise<A> =>
+    runEffectRef(eff);
   const ctxLayer = AgentCtx.Default({
     system: opts.system,
     initialTools: opts.tools,
     initialEvents: opts.initialEvents,
+    runEffect,
     ...(opts.cacheAmbient !== undefined ? { cacheAmbient: opts.cacheAmbient } : {}),
     ...(opts.renderer ? { renderer: opts.renderer } : {}),
     ...(opts.context ? { context: opts.context } : {}),
   });
-  // Compose: base services (AgentCtx + PendingSends), then the agent
-  // fibers/extensions on top. `Layer.provide` flows the base services
-  // into agentLayer's dependencies; the resulting layer's lifetime is
-  // the managed runtime's lifetime, so inference/tool-exec fibers run
-  // until `dispose()` rather than dying when a transient `runPromise`
-  // scope closes.
-  const baseLayer = Layer.merge(ctxLayer, PendingSends.Default);
+  // Compose: base services (AgentCtx + PendingSends + optional platform),
+  // then the agent fibers/extensions on top. `Layer.provide` flows the
+  // base services into agentLayer's dependencies; the resulting layer's
+  // lifetime is the managed runtime's lifetime, so inference/tool-exec
+  // fibers run until `dispose()` rather than dying when a transient
+  // `runPromise` scope closes.
+  //
+  // Platform layer (FileSystem, Path, CommandExecutor when the caller
+  // passes `NodeContext.layer`) merges in as a sibling at the base.
+  // Effects executed via `runtime.runPromise` can therefore reach those
+  // services. Output type is widened with `as never` because we don't
+  // know what the consumer composed in; capability components fail at
+  // use site if a required service is missing.
+  const platformLayer = opts.platform;
+  const baseLayerCore = Layer.merge(ctxLayer, PendingSends.Default);
+  const baseLayer = platformLayer
+    ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (Layer.merge(baseLayerCore, platformLayer) as Layer.Layer<
+        AgentCtx | PendingSends,
+        never,
+        never
+      >)
+    : baseLayerCore;
   const fullLayer = Layer.provideMerge(agentLayer(opts), baseLayer);
   const runtime = ManagedRuntime.make(fullLayer);
+  // Now that the runtime exists, swap the placeholder runner for the
+  // real binding. `runPromise` accepts effects whose R is a subtype of
+  // the runtime's provided context; the public `runEffect` signature
+  // pins R = never to keep the caller contract simple, but at runtime
+  // any service in the merged layer is reachable. Capability components
+  // typed against e.g. `FileSystem.FileSystem` reach it through this
+  // path; the cast widens the call site without polluting the public R.
+  runEffectRef = <A, E>(eff: Effect.Effect<A, E, never>): Promise<A> =>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    runtime.runPromise(eff as Effect.Effect<A, E, any>);
 
   // Access the AgentCtx service out of the runtime. ManagedRuntime
   // lazy-builds its layer on first use; grabbing the service forces
