@@ -27,6 +27,7 @@ AI_GATEWAY_API_KEY=sk-... \
 - `AI_GATEWAY_API_KEY` (required): Vercel AI Gateway key used by the inference adapter.
 - `MCP_URL` (optional): URL of an HTTP MCP server. When set, the JSX tree includes `<McpServer>` and the agent gets access to that server's tools, namespaced as `<MCP_NAME>_<toolname>`. When unset, the component is omitted from the tree entirely and the agent runs with only the local loadout.
 - `MCP_NAME` (optional, default `remote`): short identifier used in tool namespacing and the rendered system block.
+- `MCP_TOKEN` (optional): if set, sent as `Authorization: Bearer <MCP_TOKEN>` on every request to the MCP server. Use for MCPs that require auth (Smithery gateway with per-profile keys, GitHub, Linear, etc.).
 
 UX caveat: on the first turn the rendered MCP block and tool listing show as `(connecting...)` because the connection is fire-and-forget. By turn two the connection has resolved and the tools and the listing show up populated. This is the same shape as the Skills cache.
 
