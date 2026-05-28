@@ -1,59 +1,28 @@
-// Lifted from flamecast-agents' InteractiveHero. Custom 4-token tokenizer
-// (keyword / string / fn / punct) so we don't pull in highlight.js or shiki
-// for a single block. Lines can be made clickable by passing
-// `highlightedLines` + `onLineClick`; pair with `activeLine` to render
-// the currently-selected state.
+import hljs from "highlight.js/lib/core"
+import typescript from "highlight.js/lib/languages/typescript"
+import xml from "highlight.js/lib/languages/xml"
 
-const KW = /\b(import|export|from|const|let|var|async|await|function|return|type|interface)\b/g
-const STR = /(["'`])(?:(?!\1).)*?\1/g
-const COMMENT = /(\/\/.*$|#.*$)/gm
-const FN = /\b([a-zA-Z_]\w*)\s*(?=\()/g
+hljs.registerLanguage("typescript", typescript)
+hljs.registerLanguage("xml", xml)
 
-function tokenizeLine(line: string): { type: string; text: string }[] {
-	type Span = { start: number; end: number; type: string }
-	const spans: Span[] = []
-	// Strings first so later passes (comment / keyword / fn) can skip
-	// matches that start inside a string. Without this, the "//" in
-	// a URL like "https://example.com" gets misread as a line comment.
-	for (const m of line.matchAll(STR)) spans.push({ start: m.index!, end: m.index! + m[0].length, type: "string" })
-	for (const m of line.matchAll(COMMENT)) {
-		if (!spans.some(s => m.index! >= s.start && m.index! < s.end))
-			spans.push({ start: m.index!, end: m.index! + m[0].length, type: "punct" })
-	}
-	for (const m of line.matchAll(KW)) {
-		if (!spans.some(s => m.index! >= s.start && m.index! < s.end))
-			spans.push({ start: m.index!, end: m.index! + m[0].length, type: "keyword" })
-	}
-	for (const m of line.matchAll(FN)) {
-		if (!spans.some(s => m.index! >= s.start && m.index! < s.end))
-			spans.push({ start: m.index!, end: m.index! + m[1].length, type: "fn" })
-	}
-	spans.sort((a, b) => a.start - b.start)
-	const tokens: { type: string; text: string }[] = []
-	let pos = 0
-	for (const s of spans) {
-		// Defensive: drop spans that overlap a previously emitted one.
-		// The inside-string check above usually catches this, but this
-		// guarantees no slice of input is ever emitted twice.
-		if (s.start < pos) continue
-		if (s.start > pos) tokens.push({ type: "plain", text: line.slice(pos, s.start) })
-		tokens.push({ type: s.type, text: line.slice(s.start, s.end) })
-		pos = s.end
-	}
-	if (pos < line.length) tokens.push({ type: "plain", text: line.slice(pos) })
-	return tokens.length ? tokens : [{ type: "plain", text: line }]
-}
-
-function CodeToken({ type, text }: { type: string; text: string }) {
-	const classMap: Record<string, string> = {
-		keyword: "ih-tok-keyword",
-		string: "ih-tok-string",
-		fn: "ih-tok-fn",
-		punct: "ih-tok-punct",
-		plain: "",
-	}
-	const cls = classMap[type] || ""
-	return cls ? <span className={cls}>{text}</span> : <>{text}</>
+// Highlight the whole snippet once, then split on real newlines.
+// hljs spans for tsx don't cross newlines for this snippet, but we
+// rebalance just in case so each line is a self-contained HTML fragment.
+function highlightLines(code: string): string[] {
+	const html = hljs.highlight(code, { language: "typescript" }).value
+	const rawLines = html.split("\n")
+	const openStack: string[] = []
+	return rawLines.map(line => {
+		const prefix = openStack.map(tag => tag).join("")
+		const re = /<span class="[^"]*">|<\/span>/g
+		let m: RegExpExecArray | null
+		while ((m = re.exec(line)) !== null) {
+			if (m[0] === "</span>") openStack.pop()
+			else openStack.push(m[0])
+		}
+		const suffix = openStack.map(() => "</span>").join("")
+		return prefix + line + suffix
+	})
 }
 
 export function HeroCodeBlock({
@@ -69,7 +38,7 @@ export function HeroCodeBlock({
 	activeLine?: number | null
 	onLineClick?: (i: number) => void
 }) {
-	const lines = code.split("\n")
+	const lines = highlightLines(code)
 	return (
 		<div className="ih-code-col">
 			<div className="ih-code-head">
@@ -84,7 +53,7 @@ export function HeroCodeBlock({
 					</span>
 				) : null}
 			</div>
-			<pre className="ih-code-body">
+			<pre className="ih-code-body hljs">
 				<code>
 					{lines.map((line, i) => {
 						const isHighlighted = highlightedLines?.has(i) ?? false
@@ -102,11 +71,10 @@ export function HeroCodeBlock({
 								onClick={isHighlighted ? () => onLineClick?.(i) : undefined}
 							>
 								<span className="ih-line-num">{i + 1}</span>
-								<span className="ih-line-text">
-									{line ? tokenizeLine(line).map((tok, j) => (
-										<CodeToken key={j} type={tok.type} text={tok.text} />
-									)) : "\n"}
-								</span>
+								<span
+									className="ih-line-text"
+									dangerouslySetInnerHTML={{ __html: line || "\n" }}
+								/>
 							</div>
 						)
 					})}

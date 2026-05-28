@@ -5,42 +5,54 @@ import { HeroCodeBlock } from "./HeroCodeBlock"
 export const CODE = `import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
 import {
   Agent, Block, Messages,
-  Workspace, Skills, McpServer,
-  Todo, Errors, GitState,
+  Workspace, Skills, McpServer, Todo,
+  Compact,
 } from "@flamecast/agentjsx/components"
+import { NodeContext } from "@flamecast/agentjsx/node"
 
 const agent = createAgentRuntime({
   infer: createAiGatewayInfer({ model: "anthropic/claude-sonnet-4-6" }),
+  platform: NodeContext.layer,
   context: () => render(
     <Agent>
       <Block name="role">You are a coding assistant.</Block>
       <Workspace root="./" />
       <Skills root="./skills" />
+      <McpServer name="deepwiki" url="https://mcp.deepwiki.com/mcp" />
+      <McpServer
+        name="linear"
+        url="https://mcp.linear.app/mcp"
+        headers={{ Authorization: \`Bearer \${process.env.LINEAR_API_KEY}\` }}
+      />
       <Todo />
-      <Errors />
-      <GitState />
-      <McpServer name="linear" url="https://mcp.smithery.run/linear" />
-      <Messages />
+      <Compact strategy="summary" threshold={4000}>
+        <Messages />
+      </Compact>
     </Agent>
   ),
 })
 
-await agent.send("Fix the highest-priority bug in Linear and open a PR.")`
+await agent.run("Find the latest bug in Linear and open a PR fixing it.")`
 
 // Each JSX line maps to one slice in the rendered context panel.
 // "fs", "skill", and "mcp" are capability components: clicking them
-// lights up BOTH the tool pills they install AND the system block
+// light up BOTH the tool pills they install AND the system block
 // they contribute (when they contribute one). "role" is a manual
 // Block; "messages" comes from the event log.
 type Slice = "role" | "fs" | "skill" | "mcp" | "messages"
 
 const LINE_SLICE: Record<number, Slice> = {
-	7: "role",      // <Block name="role">
-	8: "fs",        // <Workspace root="./" />
-	9: "skill",     // <Skills root="./skills" />
-	10: "mcp",      // <McpServer name="linear" url="..." />
-	11: "messages", // <Messages from={events} />
-	16: "messages", // await agent.send("...")
+	13: "role",     // <Block name="role">
+	14: "fs",       // <Workspace root="./" />
+	15: "skill",    // <Skills root="./skills" />
+	16: "mcp",      // <McpServer name="deepwiki" ... />
+	17: "mcp",      // <McpServer name="linear" ...
+	18: "mcp",
+	19: "mcp",
+	20: "mcp",
+	21: "mcp",     // />
+	24: "messages", // <Messages />
+	30: "messages", // await agent.run("...")
 }
 
 const HIGHLIGHTED = new Set(Object.keys(LINE_SLICE).map(Number))
