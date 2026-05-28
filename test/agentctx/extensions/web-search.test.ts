@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { createAgentRuntime, webSearch } from "effectctx";
-import type { Event } from "effectctx";
+import { createAgentRuntime, webSearch } from "@flamecast/agentctx";
+import type { Event } from "@flamecast/agentctx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 const originalFetch = globalThis.fetch;

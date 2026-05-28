@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   createAgentRuntime,
   reconcileHydrationDangling,
-} from "effectctx";
-import type { Event, Tool } from "effectctx";
+} from "@flamecast/agentctx";
+import type { Event, Tool } from "@flamecast/agentctx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 describe("agentctx: durable tool events / hydration fidelity", () => {

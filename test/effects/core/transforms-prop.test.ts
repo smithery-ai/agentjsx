@@ -1,16 +1,16 @@
 import fc from "fast-check";
 import { Effect, Layer } from "effect";
 import { describe, expect, it } from "vitest";
-import { AgentCtx } from "effectctx/agent-ctx";
-import { createAgentRuntime } from "effectctx";
-import { adaptToProviderContext } from "effectctx/render-adapter";
+import { AgentCtx } from "@flamecast/agentctx/agent-ctx";
+import { createAgentRuntime } from "@flamecast/agentctx";
+import { adaptToProviderContext } from "@flamecast/agentctx/render-adapter";
 import type {
   Fragment,
   Extension,
   InferFn,
   InferResponse,
   TransformContext,
-} from "effectctx";
+} from "@flamecast/agentctx";
 
 // Shape of the *inner* transform function — takes blocks, returns
 // blocks. The public `Transform` type is a record `{ name, run }`; the

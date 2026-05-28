@@ -6,14 +6,14 @@ import {
   localWorkspace,
   nodeFileStore,
   nodeShell,
-} from "effectctx/node";
-import { createAgentRuntime } from "effectctx";
+} from "@flamecast/agentctx/node";
+import { createAgentRuntime } from "@flamecast/agentctx";
 import { scriptedInfer } from "../helpers/scripted-infer";
 
 let root: string;
 
 beforeEach(async () => {
-  root = await mkdtemp(join(tmpdir(), "effectctx-node-test-"));
+  root = await mkdtemp(join(tmpdir(), "agentctx-node-test-"));
 });
 
 afterEach(async () => {

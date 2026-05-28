@@ -1,8 +1,8 @@
 import fc from "fast-check";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { AgentCtx, createAgentRuntime } from "effectctx";
-import type { Tool, Event } from "effectctx";
+import { AgentCtx, createAgentRuntime } from "@flamecast/agentctx";
+import type { Tool, Event } from "@flamecast/agentctx";
 import { scriptedInfer, toolCall } from "../../agentctx/helpers/scripted-infer";
 
 // End-to-end algebraic property tests for two halt-related invariants

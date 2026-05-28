@@ -3,8 +3,8 @@ import {
   createAgentRuntime,
   recall,
   truncateToolOutputs,
-} from "effectctx";
-import type { InferFn, ProviderContext, Tool } from "effectctx";
+} from "@flamecast/agentctx";
+import type { InferFn, ProviderContext, Tool } from "@flamecast/agentctx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 // Flatten a ProviderContext into a role/content list so tests can find

@@ -1,6 +1,6 @@
 import { Schema } from "effect";
 import { describe, expect, it } from "vitest";
-import { defineTool } from "effectctx/define-tool";
+import { defineTool } from "@flamecast/agentctx/define-tool";
 
 describe("agentctx: defineTool", () => {
   it("generates JSON Schema 7 object shape without the $schema dialect URL", async () => {

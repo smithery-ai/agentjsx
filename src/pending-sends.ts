@@ -16,7 +16,7 @@ export interface PendingSendsService {
   readonly drainAll: Effect.Effect<ReadonlyArray<unknown>>;
 }
 
-export class PendingSends extends Effect.Service<PendingSends>()("effectctx/PendingSends", {
+export class PendingSends extends Effect.Service<PendingSends>()("@flamecast/agentctx/PendingSends", {
   scoped: Effect.gen(function* () {
     const queue = yield* Queue.bounded<unknown>(1024);
     const push = (content: unknown): Effect.Effect<void> =>

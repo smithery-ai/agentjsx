@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime } from "effectctx";
-import type { Event, InferFn, InferResponse, Tool, ToolCall } from "effectctx";
+import { createAgentRuntime } from "@flamecast/agentctx";
+import type { Event, InferFn, InferResponse, Tool, ToolCall } from "@flamecast/agentctx";
 
 // Algebraic property tests for:
 //

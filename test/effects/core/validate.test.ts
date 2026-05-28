@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { validateProviderContext } from "effectctx/validate";
-import type { ProviderContext } from "effectctx";
+import { validateProviderContext } from "@flamecast/agentctx/validate";
+import type { ProviderContext } from "@flamecast/agentctx";
 
 const ctx = (
   messages: ProviderContext["messages"],

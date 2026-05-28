@@ -6,9 +6,9 @@ import {
   pendingToolCallsFromLog,
   renderHistoryFragments,
   toolsInFlight,
-} from "effectctx/projections";
-import type { EventInput } from "effectctx/event-log";
-import type { Event, ToolCall } from "effectctx/types";
+} from "@flamecast/agentctx/projections";
+import type { EventInput } from "@flamecast/agentctx/event-log";
+import type { Event, ToolCall } from "@flamecast/agentctx/types";
 
 // Algebraic property tests for the pure projections in
 // `src/effects/projections.ts`. These functions sit on the hot path of
