@@ -37,15 +37,6 @@ import { fileURLToPath } from "node:url"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const SKILLS_ROOT = path.resolve(__dirname, "./skills")
-// Smithery MCP gateway with mode=smart routing. Edit the URL to point
-// at your own profile, or replace this whole block with several
-// <McpServer name=... url=... headers=... /> entries to mount multiple
-// MCPs at once. The token comes from env so it doesn't live in source.
-const SMITHERY_URL = "https://mcp.smithery.run/arjunkmrm?mode=smart"
-const SMITHERY_TOKEN = process.env.SMITHERY_TOKEN
-const SMITHERY_HEADERS = SMITHERY_TOKEN
-	? { Authorization: `Bearer ${SMITHERY_TOKEN}` }
-	: undefined
 
 const DIM = (s: string) => `\x1b[2m${s}\x1b[0m`
 const BLUE = (s: string) => `\x1b[34m${s}\x1b[0m`
@@ -119,12 +110,11 @@ const program = Effect.gen(function* () {
 					<Workspace root="./" />
 					<Skills root={SKILLS_ROOT} />
 					<McpServer
-						name="smithery"
-						url={SMITHERY_URL}
-						headers={SMITHERY_HEADERS}
+						name="deepwiki"
+						url="https://mcp.deepwiki.com/mcp"
 					/>
 					<Todo />
-					<Compact strategy="truncate-tool-outputs" limit={800}>
+					<Compact strategy="summary" threshold={4000}>
 						<Messages />
 					</Compact>
 				</Agent>,

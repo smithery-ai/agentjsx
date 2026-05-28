@@ -25,7 +25,7 @@ AI_GATEWAY_API_KEY=sk-... \
 ## Environment variables
 
 - `AI_GATEWAY_API_KEY` (required): Vercel AI Gateway key used by the inference adapter.
-- `SMITHERY_TOKEN` (optional): bearer token sent to the Smithery MCP gateway via `Authorization: Bearer <token>`. The gateway URL itself is in `cli.tsx` as `SMITHERY_URL` — edit there to point at your profile. When the token is unset the `<McpServer>` still appears in the tree and renders a failed/auth-error state; the agent keeps working with the local loadout.
+The REPL mounts `<McpServer name="deepwiki" url="https://mcp.deepwiki.com/mcp" />` directly — no token needed. The model can use `deepwiki_ask_question`, `deepwiki_read_wiki_structure`, and `deepwiki_read_wiki_contents` to look up docs for any GitHub repo.
 
 UX caveat: on the first turn the rendered MCP block and tool listing show as `(connecting...)` because the connection is fire-and-forget. By turn two the connection has resolved and the tools and the listing show up populated. This is the same shape as the Skills cache.
 
@@ -68,7 +68,7 @@ The JSX `context` tree wires up the full demo loadout:
 - `<Skills root={SKILLS_ROOT} />` — exposes the markdown files in `./skills/` to the agent. Emits a `<skills>` ambient block listing each skill with its one-line description, plus `skill_lookup` and `skill_invoke` tools the model can call to pull a skill body into context. First render shows `(loading...)`; subsequent renders (triggered by any agent event) show the populated listing.
 - `<McpServer name={MCP_NAME} url={MCP_URL} />` (conditional on `MCP_URL`) — connects to an HTTP MCP server lazily on first render and exposes its tools to the agent namespaced as `<MCP_NAME>_<toolname>`. First render shows `(connecting to ...)`; subsequent renders show the ready or failed state. Omitted from the tree entirely when `MCP_URL` is unset.
 - `<Todo />` — multi-step task tracking. State is event-log-based, so todos durably replay from the event stream. If you later layer session persistence on top, todos hydrate for free.
-- `<Compact strategy="truncate-tool-outputs" limit={800}>` wrapping `<Messages />` — caps any single tool-result fragment at 800 characters with a preview and a recovery hint. Stops a single `cat` of a giant file or a noisy `npm install` from blowing out the context window. The wrap is local: only fragments emitted inside it (the history projection) get shaped; ambient blocks above stay untouched.
+- `<Compact strategy="summary" threshold={4000}>` wrapping `<Messages />` — when running history crosses 4000 chars, the older half is fed to the model as a one-shot summarization call (using the same `infer` the main agent uses). Subsequent renders see a single `[summary of N earlier turns]` block in place of the original fragments. Burns extra tokens for the summary call but caps total context growth. Swap to `strategy="truncate-tool-outputs" limit={800}` if you'd rather clip individual tool outputs instead.
 
 `SKILLS_ROOT` is resolved via `path.resolve(__dirname, "./skills")` so the example works regardless of the cwd you run it from.
 
