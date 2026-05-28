@@ -56,7 +56,7 @@ describe("agentctx: fileSystem extension", () => {
       extensions: [fileSystem(store)],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await waitForAssistant(agent);
       const result = (await agent.events()).find(
         (e) => e.type === "tool.result" && e.tool_call_id === "c1",
@@ -80,7 +80,7 @@ describe("agentctx: fileSystem extension", () => {
       extensions: [fileSystem(store)],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await waitForAssistant(agent);
       expect(await store.read("note.md")).toBe("hi");
       const result = (await agent.events()).find(
@@ -101,7 +101,7 @@ describe("agentctx: fileSystem extension", () => {
       extensions: [fileSystem(createInMemoryStore())],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await waitForAssistant(agent);
       const result = (await agent.events()).find(
         (e) => e.type === "tool.result" && e.tool_call_id === "c1",
@@ -124,7 +124,7 @@ describe("agentctx: fileSystem extension", () => {
       extensions: [fileSystem(store)],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await waitForAssistant(agent);
       expect(await store.read("a.txt")).toBeNull();
       const result = (await agent.events()).find(
@@ -148,7 +148,7 @@ describe("agentctx: fileSystem extension", () => {
       extensions: [fileSystem(store)],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await waitForAssistant(agent);
       const result = (await agent.events()).find(
         (e) => e.type === "tool.result" && e.tool_call_id === "c1",
@@ -174,7 +174,7 @@ describe("agentctx: fileSystem extension", () => {
       extensions: [fileSystem(store)],
     });
     try {
-      agent.send("trigger");
+      agent.run("trigger");
       await waitForAssistant(agent);
       // The workspace ambient materializes into the system prefix.
       const sys = await agent.until((s) => {
@@ -198,7 +198,7 @@ describe("agentctx: fileSystem extension", () => {
       extensions: [fileSystem(stubStore(paths), { maxTreeFiles: 10 })],
     });
     try {
-      agent.send("trigger");
+      agent.run("trigger");
       await waitForAssistant(agent);
       const sys = await agent.until((s) => {
         const text = typeof s.rendered.system === "string"

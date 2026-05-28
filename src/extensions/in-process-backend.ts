@@ -76,7 +76,7 @@ export const inProcessBackend = (infer: InferFn): SubagentBackend => {
         initialEvents: opts.initialEvents,
       });
 
-      child.send(opts.prompt);
+      child.run(opts.prompt);
 
       const terminal: Promise<SubagentTerminal> = (async () => {
         try {

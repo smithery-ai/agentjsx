@@ -59,7 +59,7 @@ describe("jsx end-to-end", () => {
     });
 
     try {
-      await agent.send("list the workspace");
+      await agent.run("list the workspace");
 
       // Wait for the final assistant.message that carries the turn-2 text.
       const finalMsg = await agent.until<Event>((snap) => {

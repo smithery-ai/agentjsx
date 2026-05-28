@@ -25,7 +25,7 @@ describe("agentctx: inference.failed event surfacing", () => {
       },
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       const result = await Promise.race([
         agent.until((s) => {
           const last = s.events.at(-1);
@@ -55,7 +55,7 @@ describe("agentctx: inference.failed event surfacing", () => {
       },
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "inference.failed" ? true : null;
@@ -81,7 +81,7 @@ describe("agentctx: inference.failed event surfacing", () => {
       ],
     });
     try {
-      await agent.send("now");
+      await agent.run("now");
       const result = await Promise.race([
         agent.until((s) => {
           const last = s.events.at(-1);
@@ -107,7 +107,7 @@ describe("agentctx: inference.failed event surfacing", () => {
       infer: async () => ({ content: "" }), // would normally fail preflight
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       // With preflight off, the empty assistant.message lands without
       // triggering inference.failed. Wait briefly to confirm.
       await new Promise((r) => setTimeout(r, 200));
@@ -129,7 +129,7 @@ describe("agentctx: inference.failed event surfacing", () => {
       infer: async () => ({ content: "fine" }),
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       const result = await Promise.race([
         agent.until((s) => {
           const last = s.events.at(-1);
@@ -157,12 +157,12 @@ describe("agentctx: inference.failed event surfacing", () => {
       },
     });
     try {
-      await agent.send("first");
+      await agent.run("first");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "inference.failed" ? true : null;
       });
-      await agent.send("retry");
+      await agent.run("retry");
       const result = await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" &&

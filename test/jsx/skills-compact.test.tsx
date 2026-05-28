@@ -95,7 +95,7 @@ describe("jsx skills + compact + todo e2e", () => {
     });
 
     try {
-      await agent.send("go");
+      await agent.run("go");
 
       await agent.until<Event>((snap) => {
         for (let i = snap.events.length - 1; i >= 0; i--) {
@@ -127,7 +127,7 @@ describe("jsx skills + compact + todo e2e", () => {
       // the listing appears or the test timeout fires.
       let populated = "";
       for (let attempt = 0; attempt < 10; attempt++) {
-        await agent.send(`again-${attempt}`);
+        await agent.run(`again-${attempt}`);
         const sys = systemString(await agent.rendered());
         if (sys.includes("coding-style") && sys.includes("pull-request")) {
           populated = sys;
@@ -211,7 +211,7 @@ describe("jsx skills + compact + todo e2e", () => {
     });
 
     try {
-      await agent.send("go");
+      await agent.run("go");
 
       await agent.until<Event>((snap) => {
         for (let i = snap.events.length - 1; i >= 0; i--) {
@@ -291,7 +291,7 @@ describe("jsx skills + compact + todo e2e", () => {
     });
 
     try {
-      await agent.send("go");
+      await agent.run("go");
 
       await agent.until<Event>((snap) => {
         for (let i = snap.events.length - 1; i >= 0; i--) {

@@ -77,7 +77,7 @@ describe("tool-exec: beacon/result ordering laws", () => {
         });
         try {
           for (let t = 0; t < plan.turns.length; t++) {
-            await agent.send(`u${t}`);
+            await agent.run(`u${t}`);
             await agent.until((s) => {
               const last = s.events.at(-1);
               if (last?.type === "assistant.message" && !last.tool_calls) return true;
@@ -128,7 +128,7 @@ describe("tool-exec: beacon/result ordering laws", () => {
         });
         try {
           for (let t = 0; t < plan.turns.length; t++) {
-            await agent.send(`u${t}`);
+            await agent.run(`u${t}`);
             await agent.until((s) => {
               const last = s.events.at(-1);
               if (last?.type === "assistant.message" && !last.tool_calls) return true;
@@ -192,7 +192,7 @@ describe("tool-exec: beacon/result ordering laws", () => {
         });
         try {
           for (let t = 0; t < plan.turns.length; t++) {
-            await agent.send(`u${t}`);
+            await agent.run(`u${t}`);
             await agent.until((s) => {
               const last = s.events.at(-1);
               if (last?.type === "assistant.message" && !last.tool_calls) return true;

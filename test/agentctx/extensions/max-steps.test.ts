@@ -33,7 +33,7 @@ describe("agentctx: maxSteps extension", () => {
     });
 
     try {
-      await agent.send("go");
+      await agent.run("go");
       const halt = await agent.until(hasHalt);
       expect(halt.type).toBe("assistant.halted");
       const events = await agent.events();
@@ -53,7 +53,7 @@ describe("agentctx: maxSteps extension", () => {
     });
 
     try {
-      await agent.send("one");
+      await agent.run("one");
       const firstReply = await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "first"
@@ -71,7 +71,7 @@ describe("agentctx: maxSteps extension", () => {
         }),
       );
 
-      await agent.send("two");
+      await agent.run("two");
       const resumed = await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "second"

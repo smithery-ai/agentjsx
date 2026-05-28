@@ -16,11 +16,11 @@ describe("agentctx: clipMessages extension", () => {
     });
 
     try {
-      agent.send(long);
+      agent.run(long);
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );
-      agent.send("short-ask");
+      agent.run("short-ask");
       await agent.until((s) => {
         const count = s.events.filter((e) => e.type === "assistant.message").length;
         return count >= 2 ? true : null;

@@ -99,7 +99,7 @@ describe("jsx McpServer e2e", () => {
     });
 
     try {
-      await agent.send("go");
+      await agent.run("go");
 
       await agent.until<Event>((snap) => {
         for (let i = snap.events.length - 1; i >= 0; i--) {
@@ -213,7 +213,7 @@ describe("jsx McpServer e2e", () => {
             ),
         });
         try {
-          await agent.send("go");
+          await agent.run("go");
           // The connect is fire-and-forget; wait for the transport
           // constructor to actually run.
           for (let i = 0; i < 50 && transportCalls.length < 1; i++) {
@@ -249,7 +249,7 @@ describe("jsx McpServer e2e", () => {
             ),
         });
         try {
-          await agent.send("go");
+          await agent.run("go");
           for (let i = 0; i < 50 && transportCalls.length < 2; i++) {
             await new Promise((r) => setTimeout(r, 20));
           }

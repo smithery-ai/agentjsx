@@ -13,7 +13,7 @@ import { scriptedInfer, toolCall } from "../../agentctx/helpers/scripted-infer";
 //        post-batch}, every beacon ends up paired with a tool.result —
 //        side effects that ran are recorded.
 //   HP2 (invariant 7: pending-sends drain on results, skip on halt).
-//        If `agent.send` is called while tools are in flight AND a halt
+//        If `agent.run` is called while tools are in flight AND a halt
 //        lands before the tools complete, the queued user.message MUST
 //        NOT appear in the log after tools complete.
 //
@@ -118,7 +118,7 @@ describe("halt + pending-sends: end-to-end laws", () => {
               );
 
             try {
-              agent.send("go");
+              agent.run("go");
               await withTimeout(agent.until(hasBeacon), PER_CASE_TIMEOUT_MS, "beacon");
 
               if (phase === "before-release") {
@@ -187,11 +187,11 @@ describe("halt + pending-sends: end-to-end laws", () => {
               tools: [tool],
             });
             try {
-              agent.send("go");
+              agent.run("go");
               await withTimeout(agent.until(hasBeacon), PER_CASE_TIMEOUT_MS, "beacon");
 
               // Queue mid-tool — goes to PendingSends, not the log.
-              agent.send(queued);
+              agent.run(queued);
 
               // Halt lands.
               await agent.runtime.runPromise(

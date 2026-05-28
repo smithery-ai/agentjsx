@@ -53,7 +53,7 @@ describe("agentctx: webSearch extension", () => {
       extensions: [webSearch({ apiKey: "test-key" })],
     });
     try {
-      agent.send("search");
+      agent.run("search");
       const result = await waitForResult(agent, "c1");
       expect(calls).toHaveLength(1);
       const { url, init } = calls[0];
@@ -81,7 +81,7 @@ describe("agentctx: webSearch extension", () => {
       extensions: [webSearch({ apiKey: "" })],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       const result = await waitForResult(agent, "c1");
       const content = "content" in result ? result.content : "";
       expect(content).toMatch(/EXA_API_KEY is not set/);
@@ -101,7 +101,7 @@ describe("agentctx: webSearch extension", () => {
       extensions: [webSearch({ apiKey: "k" })],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       const result = await waitForResult(agent, "c1");
       const content = "content" in result ? result.content : "";
       expect(content).toMatch(/Exa 400/);

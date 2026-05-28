@@ -39,7 +39,7 @@ describe("agentctx: workspace extension", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "done"
@@ -75,7 +75,7 @@ describe("agentctx: workspace extension", () => {
     });
 
     try {
-      agent.send("inspect");
+      agent.run("inspect");
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );

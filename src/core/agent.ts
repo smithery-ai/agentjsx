@@ -118,7 +118,7 @@ export interface Agent {
   // (string by default; arbitrary shape if the harness exports a custom
   // schema). The runtime does not re-validate here — validation is
   // owned by the API ingest path before the call reaches us.
-  readonly send: (input: unknown) => Promise<void>;
+  readonly run: (input: unknown) => Promise<void>;
   readonly dispose: () => Promise<void>;
   readonly until: <T>(predicate: (snapshot: AgentSnapshot) => T | null) => Promise<T>;
   // Escape hatch for tests and advanced consumers.
@@ -269,7 +269,7 @@ export const createAgentRuntime = (opts: AgentOptions): Agent => {
   const result = (): Promise<Event | null> =>
     withCtx((ctx) => ctx.events.snapshot.pipe(Effect.map(lastResult)));
 
-  const send = (input: unknown): Promise<void> => {
+  const run = (input: unknown): Promise<void> => {
     const body: Effect.Effect<void, never, AgentCtx | PendingSends> = Effect.gen(function* () {
       const ctx = yield* AgentCtx;
       const pending = yield* PendingSends;
@@ -345,7 +345,7 @@ export const createAgentRuntime = (opts: AgentOptions): Agent => {
     eventChanges: streamAccessor((ctx) => ctx.events.changes),
     renderedChanges: streamAccessor((ctx) => ctx.rendered.changes),
     errorChanges: streamAccessor((ctx) => ctx.errors.changes),
-    send,
+    run,
     dispose,
     until,
     runtime,

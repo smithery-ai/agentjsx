@@ -107,7 +107,7 @@ describe("agentctx: subagents extension", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const toolResult = events.find((e) => e.type === "tool.result");
@@ -162,7 +162,7 @@ describe("agentctx: subagents extension", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       expect(childToolNames).not.toBeNull();
       expect(childToolNames).not.toContain("spawn_agent");
@@ -259,7 +259,7 @@ describe("agentctx: subagents extension", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
 
       // Depth distinction in this test is by "did the child have
@@ -328,7 +328,7 @@ describe("agentctx: subagents extension", () => {
       ],
     });
 
-    agent.send("go");
+    agent.run("go");
     // Wait until the child's infer has started (child is live).
     await new Promise<void>((resolve) => {
       const t0 = Date.now();
@@ -401,7 +401,7 @@ describe("agentctx: subagents extension", () => {
     });
 
     try {
-      agent.send("hello");
+      agent.run("hello");
       await agent.until((s) => finalResult(s.events));
       expect(seenByChild).toHaveLength(1);
       expect(seenByChild[0]).toBe("parent-context");
@@ -437,7 +437,7 @@ describe("agentctx: subagents extension", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const toolResult = events.find((e) => e.type === "tool.result");
@@ -496,7 +496,7 @@ describe("agentctx: subagents extension", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const toolResult = events.find((e) => e.type === "tool.result");
@@ -598,7 +598,7 @@ describe("agentctx: subagents extension", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
 
       // Wait until the child has captured turn 1 and is blocked on
       // the step tool. At this point the child's inference has run
@@ -677,7 +677,7 @@ describe("agentctx: subagents freeform mode", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const toolResult = events.find((e) => e.type === "tool.result");
@@ -723,7 +723,7 @@ describe("agentctx: subagents freeform mode", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       expect(childSystem).toContain("__default_child_system__");
     } finally {
@@ -784,7 +784,7 @@ describe("agentctx: subagents freeform mode", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const results = events
@@ -832,7 +832,7 @@ describe("agentctx: subagents freeform mode", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const toolResult = events.find((e) => e.type === "tool.result");
@@ -871,7 +871,7 @@ describe("agentctx: subagents freeform mode", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const toolResult = events.find((e) => e.type === "tool.result");
@@ -911,7 +911,7 @@ describe("agentctx: subagents freeform mode", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => finalResult(s.events));
       const events = await agent.events();
       const toolResult = events.find((e) => e.type === "tool.result");

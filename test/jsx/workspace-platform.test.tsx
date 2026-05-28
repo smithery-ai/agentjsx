@@ -72,7 +72,7 @@ describe("jsx workspace-platform e2e", () => {
     });
 
     try {
-      await agent.send("go");
+      await agent.run("go");
 
       const finalMsg = await agent.until<Event>((snap) => {
         for (let i = snap.events.length - 1; i >= 0; i--) {
