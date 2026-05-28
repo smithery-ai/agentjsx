@@ -1,8 +1,11 @@
-// Capability component — exposes a directory of skill markdown files
-// to the agent. Each `<root>/<name>.md` is a discoverable "skill"; the
+// Capability component — exposes a directory of skill folders to the
+// agent. Each `<root>/<name>/SKILL.md` is a discoverable "skill"; the
 // component emits an ambient block listing each skill's short
 // description and declares two tools (`skill_lookup`, `skill_invoke`)
 // the model can call to pull a skill's body into its working context.
+// References live as sibling files in the skill's folder (e.g.
+// `<root>/<name>/references/foo.md`) and can be loaded via the
+// Workspace's `read_file` tool when the skill points at them.
 //
 // Semantic note on the two tools: implementations are identical for
 // MVP — both read the skill body and return it. The split exists to
@@ -130,14 +133,17 @@ function listSkills(
     const entries = yield* fs.readDirectory(root);
     const out: SkillEntry[] = [];
     for (const entry of entries) {
-      if (!entry.endsWith(".md")) continue;
-      const name = entry.slice(0, -".md".length);
-      const full = p.resolve(root, entry);
+      const dir = p.resolve(root, entry);
+      const stat = yield* fs.stat(dir).pipe(Effect.catchAll(() => Effect.succeed(null)));
+      if (!stat || stat.type !== "Directory") continue;
+      const skillFile = p.resolve(dir, "SKILL.md");
+      const skillExists = yield* fs.exists(skillFile);
+      if (!skillExists) continue;
       const content = yield* fs
-        .readFileString(full)
+        .readFileString(skillFile)
         .pipe(Effect.catchAll(() => Effect.succeed("")));
       const { description } = parseSkillFile(content);
-      out.push({ name, description });
+      out.push({ name: entry, description });
     }
     out.sort((a, b) => a.name.localeCompare(b.name));
     return out;
@@ -178,14 +184,14 @@ export function Skills(props: SkillsProps): Node {
       });
   }
 
-  // Skill body reader, shared by both tools. Resolves `<root>/<name>.md`
-  // and returns its contents, or a "not found" string. Errors are
-  // converted to a clear `[skill_*] Error: ...` prefix.
+  // Skill body reader, shared by both tools. Resolves
+  // `<root>/<name>/SKILL.md` and returns its contents, or a "not found"
+  // string. Errors are converted to a clear `[skill_*] Error: ...` prefix.
   const readSkill = (name: string) =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
       const p = yield* Path.Path;
-      const target = p.resolve(root, `${name}.md`);
+      const target = p.resolve(root, name, "SKILL.md");
       const exists = yield* fs.exists(target);
       if (!exists) return `Skill not found: ${name}`;
       const content = yield* fs.readFileString(target);

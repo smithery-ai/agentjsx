@@ -46,12 +46,15 @@ describe("jsx skills + compact + todo e2e", () => {
   });
 
   it("Skills tools resolve markdown bodies and the menu populates after the cache resolves", async () => {
+    const { mkdir } = await import("node:fs/promises");
+    await mkdir(join(root, "coding-style"), { recursive: true });
+    await mkdir(join(root, "pull-request"), { recursive: true });
     await writeFile(
-      join(root, "coding-style.md"),
+      join(root, "coding-style", "SKILL.md"),
       "Match the surrounding style.\n",
     );
     await writeFile(
-      join(root, "pull-request.md"),
+      join(root, "pull-request", "SKILL.md"),
       "Open a draft PR early.\n",
     );
 
