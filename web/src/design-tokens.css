@@ -1,0 +1,81 @@
+/* Generated from DESIGN.md by scripts/design-md-to-css.mjs.
+ * Do not edit directly — edit DESIGN.md and re-run the script. */
+
+@import "tailwindcss";
+
+@theme {
+  /* Colors — DESIGN.md canonical names */
+  --color-primary: #ff5601;
+  --color-secondary: #ffdc4a;
+  --color-tertiary: #7b1707;
+  --color-neutral: #1a1816;
+  --color-on-neutral: #e8e6e3;
+  --color-neutral-light: #efead6;
+  --color-on-neutral-light: #232323;
+  --color-background: light-dark(#efead6, #1a1816);
+  --color-surface: light-dark(#f7f4e8, #211e1b);
+  --color-surface-tint: light-dark(#eae5d2, #26221f);
+  --color-surface-light: #f7f4e8;
+  --color-surface-tint-light: #eae5d2;
+  --color-fg-1: light-dark(#232323, #e8e6e3);
+  --color-fg-70: light-dark(#474745, #a8a6a3);
+  --color-fg-40: light-dark(#6e6c6a, #6e6c6a);
+  --color-fg-border: light-dark(#c8c4bc, #3a3633);
+
+  /* Brand-named aliases — readable utilities (bg-spark, text-ash) */
+  --color-spark: var(--color-primary);
+  --color-ember: var(--color-secondary);
+  --color-char: var(--color-tertiary);
+  --color-soot: var(--color-neutral);
+  --color-ash: var(--color-on-neutral);
+  --color-cream: var(--color-neutral-light);
+  --color-ink: var(--color-on-neutral-light);
+
+  /* Font families */
+  --font-display: GT Pantheon Micro;
+  --font-headline-lg: GT Pantheon Micro;
+  --font-headline-sm: GT Pantheon Micro;
+  --font-body: GT Pantheon Micro;
+  --font-label: GT Pantheon Micro;
+  --font-mono: Fira Code;
+
+  /* Type scale (size + leading + tracking + weight) */
+  --text-display: 48px;
+  --text-display--letter-spacing: -0.02em;
+  --text-display--font-weight: 500;
+  --text-headline-lg: 32px;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-lg--font-weight: 500;
+  --text-headline-sm: 20px;
+  --text-headline-sm--letter-spacing: -0.01em;
+  --text-headline-sm--font-weight: 500;
+  --text-body: 15px;
+  --text-body--font-weight: 400;
+  --text-label: 11px;
+  --text-label--letter-spacing: 0.06em;
+  --text-label--font-weight: 500;
+  --text-mono: 13px;
+  --text-mono--font-weight: 400;
+
+  /* Border radius */
+  --radius-none: 0px;
+  --radius-sm: 4px;
+  --radius-full: 9999px;
+
+  /* Spacing scale */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 40px;
+  --spacing-2xl: 96px;
+  --spacing-gutter: 24px;
+  --spacing-gutter-mobile: 20px;
+  --spacing-container-max: 1040px;
+  --spacing-rail-left: 220px;
+  --spacing-rail-right: 200px;
+  --spacing-breakpoint-mobile: 540px;
+
+  /* Elevation — DESIGN.md prescribes exactly one shadow. */
+  --shadow-lift: 0 8px 32px -16px rgb(0 0 0 / 0.35);
+}

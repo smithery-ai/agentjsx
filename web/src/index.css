@@ -1,0 +1,947 @@
+/*
+ * Tokens — track smithery-ai/barcelona (`packages/ui/src/theme-smithery.css`)
+ * as source of truth so flamecast feels visually continuous with the main
+ * Smithery site. HSL space, same hue triad: warm off-white #EFEAD6 ground,
+ * orange #FF5601 primary action, yellow #FFDC4A decorative accent, maroon
+ * #7B1707 destructive. Dark mode is neutral gray (no sage tint).
+ *
+ * Notes vs barcelona:
+ *  - Compat aliases (`--bg`, `--fg-*`, `--surface*`) are kept because
+ *    flamecast's existing CSS references them in hundreds of selectors;
+ *    they re-derive from the canonical tokens.
+ *  - flamecast's CTAs historically use `var(--accent)` for the primary
+ *    action color, so `--accent` here is set to the orange (matching
+ *    barcelona's `--primary` value) rather than barcelona's yellow.
+ *    `--brand-yellow` exposes barcelona's accent yellow when needed.
+ *  - `--error/--warning/--success` are flamecast extensions (status
+ *    semantics barcelona doesn't expose); kept for in-app surfaces.
+ */
+
+/* Default rounding token. Individual components can override via
+   `rounded-none`, `rounded-md`, etc. Moved away from the previous
+   sharp-corners-everywhere rule when the new console adopted the
+   floating-card aesthetic. See DESIGN.md `rounded` tokens. */
+:root {
+	--radius-sm: 6px;
+	--radius-md: 8px;
+	--radius-lg: 12px;
+}
+
+@font-face {
+	font-family: "GT Pantheon Micro";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("/fonts/gt-pantheon-micro-regular.woff2") format("woff2");
+}
+@font-face {
+	font-family: "GT Pantheon Micro";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url("/fonts/gt-pantheon-micro-medium.woff2") format("woff2");
+}
+
+:root {
+	color-scheme: light dark;
+
+	/* Light mode — barcelona's HSL palette, with neutrals shifted to share
+	 * the warm 48° hue of --background so cards/popovers don't read as
+	 * cold paper on the cream ground. (barcelona's pure-gray neutrals on
+	 * a warm bg created a temperature mismatch — see audit P1.) */
+	--background: hsl(48 13% 89%);          /* off-white #EFEAD6 */
+	--foreground: hsl(0 0% 14%);            /* off-black #232323 */
+	--card: hsl(48 22% 96%);                /* warm-tinted near-white, lifted above --background */
+	--card-foreground: hsl(0 0% 14%);
+	--popover: hsl(48 22% 96%);             /* matches --card */
+	--popover-foreground: hsl(0 0% 14%);
+	--primary: hsl(20 100% 50%);            /* orange #FF5601 */
+	--primary-foreground: hsl(0 0% 14%);
+	--secondary: hsl(48 14% 94%);           /* warm-tinted light */
+	--secondary-foreground: hsl(0 0% 14%);
+	--muted: hsl(48 14% 92%);               /* warm-tinted; sits just above --background */
+	--muted-foreground: hsl(0 0% 28%);      /* lifted from 40% → 28% for WCAG AA on warm bg */
+	--accent: hsl(20 100% 50%);             /* orange (alias of --primary; flamecast CTAs key off this) */
+	--accent-foreground: hsl(0 0% 100%);
+	--brand-yellow: hsl(48 100% 65%);       /* #FFDC4A — barcelona's accent yellow, opt-in */
+	--destructive: hsl(8 90% 25%);          /* maroon #7B1707 */
+	--destructive-foreground: hsl(0 0% 100%);
+	--error: hsl(8 90% 25%);                /* error semantics use destructive in barcelona */
+	--error-foreground: hsl(0 0% 100%);
+	--warning: hsl(40 95% 50%);
+	--warning-foreground: hsl(0 0% 14%);
+	--success: hsl(150 60% 35%);
+	--success-foreground: hsl(0 0% 100%);
+	--border: hsl(0 0% 68%);
+	--input: hsl(0 0% 68%);
+	--ring: hsl(48 100% 65%);               /* yellow focus ring per barcelona */
+
+	/* Sidebar tokens — match background for subtle appearance per barcelona,
+	 * not the inverted near-black panel flamecast had previously. */
+	--sidebar: hsl(48 13% 89%);
+	--sidebar-foreground: hsl(0 0% 14%);
+	--sidebar-accent: hsl(48 14% 94%);      /* warm-tinted hover/row bg (was neutral 0 0% 96%) */
+	--sidebar-accent-foreground: hsl(0 0% 14%);
+	--sidebar-border: hsl(0 0% 68% / 0.3);
+	--sidebar-ring: hsl(48 100% 65%);
+
+	--radius: 0.4rem;                       /* barcelona's --radius */
+
+	--shadow-xs: 1px 2px 5px 1px hsl(0 0% 10% / 0.03);
+	--shadow-sm: 1px 2px 5px 1px hsl(0 0% 10% / 0.06), 1px 1px 2px 0px hsl(0 0% 10% / 0.06);
+	--shadow-md: 1px 2px 5px 1px hsl(0 0% 10% / 0.06), 1px 2px 4px 0px hsl(0 0% 10% / 0.06);
+	--shadow-lg: 1px 2px 5px 1px hsl(0 0% 10% / 0.06), 1px 4px 6px 0px hsl(0 0% 10% / 0.06);
+	--shadow-xl: 1px 2px 5px 1px hsl(0 0% 10% / 0.06), 1px 8px 10px 0px hsl(0 0% 10% / 0.06);
+
+	/* GT Pantheon Micro — barcelona's only sans. Self-hosted from
+	 * `web/public/fonts/`; weights 400 + 500 declared via @font-face above. */
+	--font-sans: "GT Pantheon Micro", ui-sans-serif, system-ui, -apple-system,
+		"Segoe UI", Roboto, Arial, sans-serif;
+	--font-serif: "GT Pantheon Micro", ui-serif, Georgia, serif;
+	--font-mono: "Fira Code", "Courier New", ui-monospace, SFMono-Regular,
+		Menlo, Consolas, monospace;
+
+	--ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+	--ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+	/* Compat aliases for legacy `--bg` / `--fg-*` selectors.
+	 * Text-grade tokens (--fg-70, --fg-40) are SOLID in light mode because
+	 * alpha-blending #232323 onto warm cream can't reach WCAG AA (the
+	 * effective lightness lands ~50% L which is 2-3:1 contrast). Decorative
+	 * tokens (--fg-20, --fg-10, --fg-05) stay alpha-based for borders,
+	 * separators, and hover overlays. */
+	--bg: var(--background);
+	--surface: var(--card);
+	--surface-tint: var(--muted);
+	--fg-1: var(--foreground);
+	--fg-70: hsl(0 0% 28%);                 /* solid muted text — AAA on cream */
+	--fg-40: hsl(0 0% 42%);                 /* solid less-emphasized text — AA on cream */
+	--fg-20: hsl(0 0% 14% / 0.2);
+	--fg-10: hsl(0 0% 14% / 0.1);
+	--fg-05: hsl(0 0% 14% / 0.05);
+}
+
+/* Dark — canonical Flamecast theme per DESIGN.md.
+ * All values resolve to canonical --color-* tokens declared in
+ * design-tokens.css (generated from DESIGN.md). Legacy variable names
+ * (--background, --fg-1, etc.) are kept so existing CSS selectors keep
+ * working; new code should reach for the brand-named utilities directly
+ * (bg-spark, text-ash, p-md, rounded-sm). */
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--background: var(--color-soot);
+		--foreground: var(--color-ash);
+		--card: var(--color-surface);
+		--card-foreground: var(--color-ash);
+		--popover: var(--color-surface);
+		--popover-foreground: var(--color-ash);
+		--primary: var(--color-spark);
+		--primary-foreground: #1A0F05;
+		--secondary: var(--color-surface);
+		--secondary-foreground: var(--color-ash);
+		--muted: var(--color-surface-tint);
+		--muted-foreground: var(--color-fg-70);
+		--accent: var(--color-spark);
+		--accent-foreground: #1A0F05;
+		--brand-yellow: var(--color-ember);
+		--destructive: var(--color-char);
+		--destructive-foreground: var(--color-ash);
+		--error: var(--color-char);
+		--error-foreground: var(--color-ash);
+		--warning: var(--color-ember);
+		--warning-foreground: var(--color-soot);
+		--success: hsl(150 50% 60%);
+		--success-foreground: var(--color-soot);
+		--border: var(--color-fg-border);
+		--input: var(--color-fg-border);
+		--ring: var(--color-spark);
+		--sidebar: var(--color-soot);
+		--sidebar-foreground: var(--color-ash);
+		--sidebar-accent: var(--color-surface-tint);
+		--sidebar-accent-foreground: var(--color-ash);
+		--sidebar-border: rgb(58 54 51 / 0.5);
+		--sidebar-ring: var(--color-spark);
+		--fg-1: var(--color-fg-1);
+		--fg-70: var(--color-fg-70);
+		--fg-40: var(--color-fg-40);
+		--fg-20: hsl(48 13% 89% / 0.2);
+		--fg-10: hsl(48 13% 89% / 0.1);
+		--fg-05: hsl(48 13% 89% / 0.05);
+	}
+}
+
+/* Explicit theme override — set on <html data-theme="..."> by the toggle.
+ * Wins over the prefers-color-scheme media query. */
+:root[data-theme="light"] {
+	color-scheme: light;
+}
+:root[data-theme="dark"] {
+	color-scheme: dark;
+	--background: var(--color-soot);
+	--foreground: var(--color-ash);
+	--card: var(--color-surface);
+	--card-foreground: var(--color-ash);
+	--popover: var(--color-surface);
+	--popover-foreground: var(--color-ash);
+	--primary: var(--color-spark);
+	--primary-foreground: #1A0F05;
+	--secondary: var(--color-surface);
+	--secondary-foreground: var(--color-ash);
+	--muted: var(--color-surface-tint);
+	--muted-foreground: var(--color-fg-70);
+	--accent: var(--color-spark);
+	--accent-foreground: #1A0F05;
+	--brand-yellow: var(--color-ember);
+	--destructive: var(--color-char);
+	--destructive-foreground: var(--color-ash);
+	--error: var(--color-char);
+	--error-foreground: var(--color-ash);
+	--warning: var(--color-ember);
+	--warning-foreground: var(--color-soot);
+	--success: hsl(150 50% 60%);
+	--success-foreground: var(--color-soot);
+	--border: var(--color-fg-border);
+	--input: var(--color-fg-border);
+	--ring: var(--color-spark);
+	--sidebar: var(--color-soot);
+	--sidebar-foreground: var(--color-ash);
+	--sidebar-accent: var(--color-surface-tint);
+	--sidebar-accent-foreground: var(--color-ash);
+	--sidebar-border: rgb(58 54 51 / 0.5);
+	--sidebar-ring: var(--color-spark);
+	--fg-1: var(--color-fg-1);
+	--fg-70: var(--color-fg-70);
+	--fg-40: var(--color-fg-40);
+	--fg-20: hsl(48 13% 89% / 0.2);
+	--fg-10: hsl(48 13% 89% / 0.1);
+	--fg-05: hsl(48 13% 89% / 0.05);
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; margin: 0; }
+
+body {
+	background: var(--bg);
+	color: var(--fg-1);
+	font-family: var(--font-sans);
+	font-size: 14px;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+a {
+	color: var(--fg-1);
+	text-decoration: none;
+	border-bottom: 1px solid var(--fg-20);
+	transition: border-color 120ms ease;
+}
+a:hover { border-bottom-color: var(--fg-1); }
+a:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+	border-bottom-color: transparent;
+}
+
+::selection { background: var(--accent); color: var(--accent-foreground); }
+
+.caption {
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--fg-70);
+}
+
+/* `.caption` repeated as a section header above empty-state cards or
+ * spawn dropdown content. Tightens the bottom spacing without touching
+ * the global `.caption` rule (which serves in-app micro-captions). */
+.caption-section { margin-bottom: 16px; }
+
+/* ---- Landing page (/) ---- */
+
+.landing-section {
+	margin-top: 24px;
+	min-width: 0;
+}
+
+.landing {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+}
+.landing-head {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 0 24px;
+	height: 56px;
+	border-bottom: 1px solid var(--fg-10);
+}
+.landing-head .brand {
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	font-size: 16px;
+	border-bottom: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+}
+.landing-head .landing-cta {
+	margin-left: auto;
+	font-size: 11px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--fg-40);
+	border: 1px solid var(--fg-20);
+	padding: 6px 12px;
+	display: inline-flex;
+	align-items: center;
+	transition: color 100ms ease, border-color 100ms ease;
+}
+.landing-head .landing-cta:hover {
+	color: var(--fg-1);
+	border-color: var(--fg-40);
+}
+@media (max-width: 540px) {
+	.landing-head .landing-cta {
+		min-height: 44px;
+		padding: 12px 16px;
+	}
+}
+
+.landing-main {
+	flex: 1;
+	max-width: 1040px;
+	width: 100%;
+	min-width: 0;
+	margin: 0 auto;
+	padding: 96px 24px 96px;
+}
+
+.landing-hero {
+	margin-bottom: 32px;
+}
+.landing-hero-cta {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-top: 20px;
+	flex-wrap: wrap;
+}
+.landing-hero-status {
+	display: inline-flex;
+	flex-direction: column;
+	gap: 1px;
+	font-family: var(--font-mono);
+	font-size: 10px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+.landing-hero-status-tag {
+	color: var(--accent);
+	font-weight: 600;
+}
+.landing-hero-status-text {
+	color: var(--fg-40);
+}
+
+.landing-main h1 { max-width: 56ch; }
+.landing-main .lede { max-width: 72ch; }
+.landing-main h1 {
+	font-family: var(--font-serif);
+	font-size: 48px;                  /* DESIGN.md: display — hero-only */
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	line-height: 1.05;
+	margin: 0 0 16px;
+}
+.landing-main .lede {
+	font-size: 15px;
+	color: var(--fg-70);
+	margin: 0;
+	text-wrap: pretty;
+}
+
+@media (max-width: 540px) {
+	.landing-head {
+		gap: 8px;
+		padding: 0 12px;
+	}
+	.landing-head .brand {
+		font-size: 15px;
+		gap: 8px;
+	}
+	.landing-head a.docs,
+	.landing-head .docs.skill-copy,
+	.landing-head .landing-cta {
+		display: none;
+	}
+	.landing-main {
+		padding: 16px 20px 64px;
+	}
+	.landing-main h1 {
+		font-size: 36px;              /* display steps down on mobile */
+		max-width: 100%;
+		text-wrap: balance;
+	}
+	.landing-main .lede {
+		max-width: 100%;
+		overflow-wrap: anywhere;
+	}
+	.landing-hero-cta {
+		align-items: stretch;
+	}
+	.landing-hero-cta .cta-primary,
+	.landing-hero-cta .cta-secondary {
+		width: 100%;
+		justify-content: center;
+		white-space: normal;
+	}
+}
+
+.landing-section + .landing-section { margin-top: 80px; }
+/* `.caption` inside a landing section is a section heading (h2). The
+ * explicit margin-reset is needed because the global `.caption`
+ * is for in-app micro-captions; landing wants a real section heading
+ * visual, no browser-default h2 margins leaking in. */
+.landing-section > .caption {
+	margin: 0 0 12px;
+	font-size: 18px;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+	text-transform: none;
+	color: var(--fg-1);
+	font-weight: 500;
+}
+
+.landing-code pre {
+	background: var(--surface-tint);
+	border: 1px solid var(--fg-10);
+	border-radius: var(--radius);
+	padding: 12px 14px;
+	font-family: var(--font-mono);
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--fg-1);
+	/* Cap the height so tall tabs scroll instead of pushing the page,
+	 * but short snippets (e.g. a one-line curl) still hug their content. */
+	max-height: 320px;
+	overflow: auto;
+	scrollbar-width: none;
+}
+.landing-code pre::-webkit-scrollbar { display: none; }
+/* highlight.js's github theme adds 12.5px padding on .hljs; we already
+ * have padding on the pre, so zero it here to keep the box compact. */
+.landing-code pre code.hljs { padding: 0; background: transparent; }
+
+.landing-links {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 0;
+	border-top: 1px solid var(--fg-10);
+}
+.landing-links li { border-bottom: 1px solid var(--fg-10); }
+.landing-links a {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 14px 0;
+	border-bottom: none;
+	color: var(--fg-1);
+	/* Animate transform, not padding — transform is composited and
+	 * doesn't trigger layout. */
+	transition: transform 200ms var(--ease-out);
+}
+.landing-links a:hover {
+	transform: translateX(4px);
+}
+.landing-link-label {
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+.landing-link-desc {
+	font-size: 12px;
+	color: var(--fg-40);
+}
+
+.cta-primary,
+.cta-secondary {
+	display: inline-flex;
+	align-items: center;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	padding: 12px 22px;
+	min-height: 44px;
+	box-sizing: border-box;
+	border-bottom: none;
+	border-radius: var(--radius);
+	transition:
+		background 160ms var(--ease-out),
+		color 160ms var(--ease-out),
+		border-color 160ms var(--ease-out),
+		transform 160ms var(--ease-out);
+}
+.cta-primary:active,
+.cta-secondary:active { transform: scale(0.97); }
+.cta-primary {
+	background: var(--accent);
+	/* Dark text on the saturated orange — white-on-orange measures ~3:1
+	 * (fails WCAG AA for body). Deep brown lifts to ~7:1 and stays on
+	 * the brand palette (matches Clawd's parachute rim). */
+	color: #1a0f05;
+	border: 1px solid var(--accent);
+}
+.cta-primary:hover {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #1a0f05;
+}
+.cta-agents { gap: 10px; }
+.cta-agent-icons {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+}
+.cta-agent-icon {
+	width: 16px;
+	height: 16px;
+	transition: transform 300ms ease-out;
+}
+.cta-icon-claude { rotate: -6deg; }
+.cta-icon-openai { margin-left: 4px; }
+.cta-icon-windsurf { margin-left: 4px; }
+.cta-icon-opencode { margin-left: 2px; rotate: 6deg; }
+.cta-agents:hover .cta-icon-claude {
+	transform: rotate(-12deg) translateX(-4px);
+}
+.cta-agents:hover .cta-icon-openai {
+	transform: translate(-2px, -2px) rotate(6deg) scale(1.1);
+}
+.cta-agents:hover .cta-icon-windsurf {
+	transform: translate(2px, 2px) rotate(-6deg) scale(1.1);
+}
+.cta-agents:hover .cta-icon-opencode {
+	transform: rotate(12deg) translateX(4px);
+}
+.cta-secondary {
+	background: var(--fg-05);
+	color: var(--fg-1);
+	border: 1px solid var(--fg-10);
+}
+.cta-secondary:hover {
+	background: color-mix(in oklch, var(--fg-1) 8%, transparent);
+	border-color: var(--fg-20);
+}
+.cta-primary:focus-visible,
+.cta-secondary:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/* highlight.js — dark-mode syntax palette overrides. Mirrors the GitHub
+ * Dark categories (keyword/function/attr/string/builtin/comment) in OKLCH
+ * so it composes with the rest of the design-token system. */
+:root[data-theme="dark"],
+:root:not([data-theme="light"]) {
+	--syntax-keyword:  oklch(0.7100 0.1800 25);
+	--syntax-function: oklch(0.7700 0.1400 305);
+	--syntax-attr:     oklch(0.7800 0.1000 240);
+	--syntax-string:   oklch(0.8500 0.0700 235);
+	--syntax-builtin:  oklch(0.7700 0.1500 55);
+	--syntax-comment:  color-mix(in oklch, var(--foreground) 60%, transparent);
+}
+
+:root[data-theme="dark"] pre code.hljs,
+:root[data-theme="dark"] code.hljs {
+	background: transparent;
+	color: var(--fg-1);
+}
+:root[data-theme="dark"] .hljs-doctag,
+:root[data-theme="dark"] .hljs-keyword,
+:root[data-theme="dark"] .hljs-meta .hljs-keyword,
+:root[data-theme="dark"] .hljs-template-tag,
+:root[data-theme="dark"] .hljs-template-variable,
+:root[data-theme="dark"] .hljs-type,
+:root[data-theme="dark"] .hljs-variable.language_ { color: var(--syntax-keyword); }
+:root[data-theme="dark"] .hljs-title,
+:root[data-theme="dark"] .hljs-title.class_,
+:root[data-theme="dark"] .hljs-title.class_.inherited__,
+:root[data-theme="dark"] .hljs-title.function_ { color: var(--syntax-function); }
+:root[data-theme="dark"] .hljs-attr,
+:root[data-theme="dark"] .hljs-attribute,
+:root[data-theme="dark"] .hljs-literal,
+:root[data-theme="dark"] .hljs-meta,
+:root[data-theme="dark"] .hljs-number,
+:root[data-theme="dark"] .hljs-operator,
+:root[data-theme="dark"] .hljs-variable,
+:root[data-theme="dark"] .hljs-selector-attr,
+:root[data-theme="dark"] .hljs-selector-class,
+:root[data-theme="dark"] .hljs-selector-id { color: var(--syntax-attr); }
+:root[data-theme="dark"] .hljs-regexp,
+:root[data-theme="dark"] .hljs-string,
+:root[data-theme="dark"] .hljs-meta .hljs-string { color: var(--syntax-string); }
+:root[data-theme="dark"] .hljs-built_in,
+:root[data-theme="dark"] .hljs-symbol { color: var(--syntax-builtin); }
+:root[data-theme="dark"] .hljs-comment,
+:root[data-theme="dark"] .hljs-code,
+:root[data-theme="dark"] .hljs-formula { color: var(--syntax-comment); }
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) pre code.hljs,
+	:root:not([data-theme="light"]) code.hljs {
+		background: transparent;
+		color: var(--fg-1);
+	}
+	:root:not([data-theme="light"]) .hljs-keyword,
+	:root:not([data-theme="light"]) .hljs-type { color: var(--syntax-keyword); }
+	:root:not([data-theme="light"]) .hljs-title,
+	:root:not([data-theme="light"]) .hljs-title.class_,
+	:root:not([data-theme="light"]) .hljs-title.function_ { color: var(--syntax-function); }
+	:root:not([data-theme="light"]) .hljs-number,
+	:root:not([data-theme="light"]) .hljs-attr,
+	:root:not([data-theme="light"]) .hljs-literal { color: var(--syntax-attr); }
+	:root:not([data-theme="light"]) .hljs-string { color: var(--syntax-string); }
+	:root:not([data-theme="light"]) .hljs-built_in { color: var(--syntax-builtin); }
+	:root:not([data-theme="light"]) .hljs-comment { color: var(--syntax-comment); }
+}
+
+/* HeroCodeBlock — lifted verbatim from flamecast InteractiveHero so the
+   code block on this landing reads identically to flamecast's. */
+.ih-code-col {
+	min-width: 0;
+	border: 1px solid var(--fg-10);
+	border-radius: var(--radius-sm);
+	background: var(--surface-tint);
+	overflow: hidden;
+}
+.ih-code-head {
+	display: flex;
+	align-items: center;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--fg-10);
+}
+.ih-code-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--font-mono);
+	font-size: 11px;
+	color: var(--fg-40);
+	background: none;
+	border: none;
+	padding: 4px 8px;
+	cursor: pointer;
+	transition: color 160ms;
+}
+button.ih-code-tab:hover { color: var(--fg-70); }
+.ih-code-tab-active { color: var(--fg-1); }
+.ih-code-body {
+	margin: 0;
+	padding: 8px 0;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	line-height: 1.6;
+	overflow-x: auto;
+	scrollbar-width: none;
+	background: transparent;
+}
+.ih-code-body::-webkit-scrollbar { display: none; }
+.ih-code-body code { display: block; }
+
+.ih-code-line {
+	display: flex;
+	align-items: baseline;
+	min-height: 1.6em;
+	padding: 0 14px 0 0;
+	transition: background 200ms var(--ease-out);
+}
+.ih-line-num {
+	display: inline-block;
+	width: 36px;
+	flex-shrink: 0;
+	text-align: right;
+	padding-right: 12px;
+	color: var(--fg-20);
+	font-size: 11px;
+	user-select: none;
+}
+.ih-line-text {
+	white-space: pre;
+}
+
+/* Syntax tokens — dark mode defaults; light mode overrides match flamecast. */
+.ih-tok-keyword { color: #c084fc; }
+.ih-tok-string  { color: #86efac; }
+.ih-tok-fn      { color: #93c5fd; }
+.ih-tok-punct   { color: var(--fg-40); }
+
+@media (prefers-color-scheme: light) {
+	:root:not([data-theme="dark"]) .ih-tok-keyword { color: #7c3aed; }
+	:root:not([data-theme="dark"]) .ih-tok-string  { color: #16a34a; }
+	:root:not([data-theme="dark"]) .ih-tok-fn      { color: #2563eb; }
+}
+:root[data-theme="light"] .ih-tok-keyword { color: #7c3aed; }
+:root[data-theme="light"] .ih-tok-string  { color: #16a34a; }
+:root[data-theme="light"] .ih-tok-fn      { color: #2563eb; }
+
+@media (max-width: 540px) {
+	.ih-code-body { font-size: 11px; }
+}
+
+/* Hero code block — narrower than the full 1040px landing-main and
+   centered so the snippet reads as a focal artifact below the hero
+   text. Bigger font + line-height + vertical padding so the block sits
+   taller than the default ih-code-body used in InteractiveHero. */
+.landing-code-section {
+	max-width: 600px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.landing-code-section .ih-code-body {
+	padding: 28px 0;
+	font-size: 12.5px;
+	line-height: 1.95;
+	min-height: 540px;
+	overflow-x: hidden;
+}
+.landing-code-section .ih-code-line {
+	min-height: 2em;
+	align-items: flex-start;
+}
+/* Wrap long lines so the block doesn't horizontally scroll. pre-wrap
+   keeps leading indentation; the hanging-indent on continuation lines
+   is handled by .ih-line-text via padding-left + text-indent so wrapped
+   lines align under the code, not the line-number gutter. */
+.landing-code-section .ih-line-text {
+	white-space: pre-wrap;
+	word-break: break-word;
+	flex: 1;
+	min-width: 0;
+}
+
+/* Interactive context hero — code on the left, rendered ProviderContext
+   on the right. Clicking a highlighted line in the code dims everything
+   in the panel except the slice that line produces, demonstrating
+   "JSX line -> context piece" directly. */
+.context-hero {
+	display: grid;
+	grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+	gap: 20px;
+	align-items: start;
+}
+@media (max-width: 720px) {
+	.context-hero { grid-template-columns: 1fr; }
+}
+
+.context-hero .ih-code-body {
+	padding: 16px 0;
+	font-size: 13px;
+	line-height: 1.85;
+}
+.context-hero .ih-code-line {
+	min-height: 1.85em;
+}
+.context-hero .ih-line-hl {
+	background: color-mix(in oklch, var(--accent) 10%, transparent);
+}
+.context-hero .ih-line-hl .ih-line-num {
+	color: var(--accent);
+}
+.context-hero .ih-line-active {
+	background: color-mix(in oklch, var(--accent) 22%, transparent);
+}
+
+.ctx-panel {
+	border: 1px solid var(--fg-10);
+	border-radius: var(--radius-sm);
+	background: var(--surface-tint);
+	overflow: hidden;
+}
+.ctx-head {
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--fg-10);
+	font-family: var(--font-mono);
+	font-size: 11px;
+	color: var(--fg-40);
+}
+.ctx-body {
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	font-family: var(--font-mono);
+	font-size: 12px;
+}
+.ctx-section { display: flex; flex-direction: column; gap: 6px; }
+.ctx-label {
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--fg-40);
+}
+.ctx-piece {
+	transition: opacity 200ms var(--ease-out), background 200ms var(--ease-out);
+	border-radius: 4px;
+	padding: 2px 6px;
+	margin: 0 -6px;
+}
+.ctx-piece-active {
+	background: color-mix(in oklch, var(--accent) 16%, transparent);
+	color: var(--fg-1);
+}
+.ctx-piece-dim {
+	opacity: 0.32;
+}
+.ctx-mono {
+	font-family: var(--font-mono);
+	white-space: pre;
+	margin: 0;
+	font-size: 11px;
+	color: var(--fg-70);
+}
+.ctx-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.ctx-pill {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: var(--radius-full);
+	background: var(--fg-10);
+	font-size: 11px;
+	color: var(--fg-70);
+}
+.ctx-role {
+	display: inline-block;
+	padding: 1px 6px;
+	border-radius: 3px;
+	background: var(--fg-10);
+	font-size: 10px;
+	color: var(--fg-70);
+	margin-right: 8px;
+}
+.ctx-msg { color: var(--fg-1); }
+
+/* XML-style tags shown in the rendered-context panel. The user sees
+   the literal <role>...</role> envelope so the connection between the
+   JSX <Block name="role"> on the left and the produced tag on the right
+   is unambiguous. */
+.ctx-tag {
+	color: var(--accent);
+	opacity: 0.85;
+}
+
+/* Split-pane wrapper: code + rendered context share a single bordered
+   container with one header strip and a vertical divider down the middle.
+   The arrow in the header makes the input -> output relationship obvious. */
+.split-pane {
+	border: 1px solid var(--fg-10);
+	border-radius: var(--radius-sm);
+	background: var(--surface-tint);
+	overflow: hidden;
+}
+.split-head {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	border-bottom: 1px solid var(--fg-10);
+}
+.split-head > * {
+	padding: 8px 12px;
+	display: flex;
+	align-items: center;
+	min-height: 32px;
+}
+.split-head > *:first-child {
+	border-right: 1px solid var(--fg-10);
+}
+@media (max-width: 720px) {
+	.split-head { grid-template-columns: 1fr; }
+	.split-head > *:first-child { border-right: none; }
+}
+.split-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-family: var(--font-mono);
+	font-size: 11px;
+	color: var(--fg-1);
+}
+.split-tab-out {
+	color: var(--fg-40);
+	justify-self: start;
+}
+.split-arrow {
+	font-family: var(--font-mono);
+	font-size: 12px;
+	color: var(--fg-40);
+}
+.split-body {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	align-items: stretch;
+	min-height: 560px;
+}
+.split-body > * { min-height: 0; }
+@media (max-width: 720px) {
+	.split-body {
+		grid-template-columns: 1fr;
+		min-height: 0;
+	}
+	.split-head { grid-template-columns: 1fr auto 1fr; }
+}
+
+/* Bigger type + more line-height inside the split pane so the widget
+   reads as a focal artifact rather than a tight config snippet. */
+.split-pane .ih-code-body {
+	padding: 20px 0;
+	font-size: 14px;
+	line-height: 2;
+}
+.split-pane .ih-code-line {
+	min-height: 2em;
+}
+.split-pane .ctx-body {
+	padding: 20px;
+	gap: 22px;
+	font-size: 13px;
+}
+
+/* Embedded children lose their own chrome — the parent owns the border,
+   radius, and head row. A 1px vertical rule between the two panes
+   provides visual separation without doubling up borders. */
+.split-pane .ih-code-col {
+	border: none;
+	border-radius: 0;
+	border-right: 1px solid var(--fg-10);
+	background: transparent;
+}
+.split-pane .ih-code-head { display: none; }
+.split-pane .ctx-panel {
+	border: none;
+	border-radius: 0;
+	background: transparent;
+}
+@media (max-width: 720px) {
+	.split-pane .ih-code-col {
+		border-right: none;
+		border-bottom: 1px solid var(--fg-10);
+	}
+}
+
+/* Pill states for the tools row when individual extension groups are
+   active (fs / skill / mcp). Active pills lift slightly; dimmed pills
+   fade so the eye lands on the produced group. */
+.ctx-pill-active {
+	background: color-mix(in oklch, var(--accent) 22%, transparent);
+	color: var(--fg-1);
+}
+.ctx-pill-dim {
+	opacity: 0.32;
+}

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="color-scheme" content="dark light" />
+		<meta name="theme-color" content="#1A1816" />
+		<title>effectctx — Render your agent's context like a UI</title>
+		<meta
+			name="description"
+			content="An Effect-based agent harness that renders LLM context like React renders the DOM. Event log to JSX to context, composable steering extensions, runs anywhere V8 does."
+		/>
+		<!-- GT Pantheon Micro is self-hosted from /fonts; preload the
+		     400/500 weights so first paint doesn't FOUT-flash. -->
+		<link
+			rel="preload"
+			href="/fonts/gt-pantheon-micro-regular.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<link
+			rel="preload"
+			href="/fonts/gt-pantheon-micro-medium.woff2"
+			as="font"
+			type="font/woff2"
+			crossorigin
+		/>
+		<!-- Mono only — code blocks still use Fira Code. -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap"
+			rel="stylesheet"
+		/>
+	</head>
+	<body>
+		<div id="root"></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
+</html>
