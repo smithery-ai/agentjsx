@@ -1,6 +1,6 @@
 # agentjsx (experimental)
 
-A runtime agnostic framework for composing modern agent harnesses using JSX.
+A runtime agnostic agent harness framework for composing modern agents through reusable components in JSX.
 
 ## Install
 
