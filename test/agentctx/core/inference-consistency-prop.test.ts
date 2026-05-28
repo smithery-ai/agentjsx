@@ -84,9 +84,9 @@ describe("agentctx: inference consistency under adversarial delays", () => {
             try {
               for (const msg of messages) {
                 await withTimeout(
-                  agent.send(msg),
+                  agent.run(msg),
                   PER_CASE_TIMEOUT_MS,
-                  "agent.send",
+                  "agent.run",
                 );
                 await withTimeout(
                   agent.until((s) => {

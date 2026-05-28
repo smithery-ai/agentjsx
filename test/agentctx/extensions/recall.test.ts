@@ -21,7 +21,7 @@ describe("agentctx: recall extension", () => {
     });
 
     try {
-      await agent.send(big);
+      await agent.run(big);
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" &&
@@ -60,21 +60,21 @@ describe("agentctx: recall extension", () => {
     });
 
     try {
-      await agent.send("one");
+      await agent.run("one");
       await agent.until(
         (s) =>
           s.events.filter((e) => e.type === "assistant.message").length >= 1
             ? true
             : null,
       );
-      await agent.send("two");
+      await agent.run("two");
       await agent.until(
         (s) =>
           s.events.filter((e) => e.type === "assistant.message").length >= 2
             ? true
             : null,
       );
-      await agent.send("recall my replies");
+      await agent.run("recall my replies");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" &&
@@ -128,7 +128,7 @@ describe("agentctx: recall extension", () => {
     });
 
     try {
-      await agent.send("go");
+      await agent.run("go");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" &&
@@ -166,7 +166,7 @@ describe("agentctx: recall extension", () => {
     });
 
     try {
-      await agent.send(huge);
+      await agent.run(huge);
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" &&

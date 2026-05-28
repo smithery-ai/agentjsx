@@ -167,7 +167,7 @@ describe("agentctx: durable tool events / hydration fidelity", () => {
     });
     let persisted: ReadonlyArray<Event>;
     try {
-      live.send("go");
+      live.run("go");
       await live.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && !last.tool_calls ? last : null;

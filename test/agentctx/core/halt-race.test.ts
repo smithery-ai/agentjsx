@@ -55,7 +55,7 @@ describe("agentctx: halt race vs in-flight tool batch", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
 
       // Wait for beacon + tool.run to be live.
       await agent.until(hasBeacon);
@@ -95,7 +95,7 @@ describe("agentctx: halt race vs in-flight tool batch", () => {
       // semantics, a NEW user.message un-halts the agent and inference
       // resumes — scriptedInfer step 2 fires for the "again" turn.
       const eventsBeforeSecondSend = final.length;
-      await agent.send("again");
+      await agent.run("again");
       const resumed = await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" &&
@@ -140,12 +140,12 @@ describe("agentctx: halt race vs in-flight tool batch", () => {
     });
 
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until(hasBeacon);
 
       // Queue a user message — tools are in flight so this goes into
       // PendingSends rather than the event log.
-      agent.send("queued-mid-tool");
+      agent.run("queued-mid-tool");
 
       // Halt lands now.
       await agent.runtime.runPromise(

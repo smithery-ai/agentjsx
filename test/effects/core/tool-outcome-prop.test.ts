@@ -80,7 +80,7 @@ describe("tool outcomes: extraEvents ordering + error surfacing", () => {
 
             const agent = createAgentRuntime({ infer, tools: [tool] });
             try {
-              await agent.send("go");
+              await agent.run("go");
               await withTimeout(
                 agent.until((s) => {
                   const last = s.events.at(-1);
@@ -165,7 +165,7 @@ describe("tool outcomes: extraEvents ordering + error surfacing", () => {
 
             const agent = createAgentRuntime({ infer, tools: [tool] });
             try {
-              await agent.send("go");
+              await agent.run("go");
               await withTimeout(
                 agent.until((s) => {
                   const last = s.events.at(-1);

@@ -34,7 +34,7 @@ type AgentRuntime = ReturnType<typeof createCodingAgent>
 // readability win.
 async function turn(agent: AgentRuntime, input: string): Promise<void> {
 	const startLen = (await agent.events()).length
-	await agent.send(input)
+	await agent.run(input)
 
 	let printed = startLen
 	while (true) {

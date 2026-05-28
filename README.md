@@ -41,7 +41,7 @@ const agent = createAgentRuntime({
   ),
 })
 
-await agent.send("Look up how vitest's expect.toMatchInlineSnapshot works and write a small example.")
+await agent.run("Find the latest bug in Linear and open a PR fixing it.")
 ```
 
 ## Examples

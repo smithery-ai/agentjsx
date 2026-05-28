@@ -39,26 +39,26 @@ describe("agentctx: compact extension", () => {
     });
 
     try {
-      await agent.send("t1");
+      await agent.run("t1");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "assistant.message").length >= 1
           ? true
           : null,
       );
-      await agent.send("t2");
+      await agent.run("t2");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "assistant.message").length >= 2
           ? true
           : null,
       );
-      await agent.send("t3");
+      await agent.run("t3");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "assistant.message").length >= 3
           ? true
           : null,
       );
 
-      await agent.send("please compact now");
+      await agent.run("please compact now");
       const boundary = await agent.until((s) => {
         const e = s.events.find((ev) => ev.type === "compaction.summary");
         return e ?? null;
@@ -122,7 +122,7 @@ describe("agentctx: compact extension", () => {
     });
 
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       await agent.until((s) =>
         s.events.some(
           (e) => e.type === "tool.result" && e.tool_call_id === "c1",
@@ -172,34 +172,34 @@ describe("agentctx: compact extension", () => {
     });
 
     try {
-      await agent.send("t1");
+      await agent.run("t1");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "assistant.message").length >= 1
           ? true
           : null,
       );
-      await agent.send("t2");
+      await agent.run("t2");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "assistant.message").length >= 2
           ? true
           : null,
       );
 
-      await agent.send("compact #1");
+      await agent.run("compact #1");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "compaction.summary").length >= 1
           ? true
           : null,
       );
 
-      await agent.send("t3");
+      await agent.run("t3");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "assistant.message").length >= 4
           ? true
           : null,
       );
 
-      await agent.send("compact #2");
+      await agent.run("compact #2");
       await agent.until((s) =>
         s.events.filter((e) => e.type === "compaction.summary").length >= 2
           ? true

@@ -25,7 +25,7 @@ describe("agentctx: error surfacing and fiber recovery", () => {
 
     const agent = createAgentRuntime({ infer });
     try {
-      agent.send("hi");
+      agent.run("hi");
 
       const errs = await agent.until((s) =>
         s.errors.length > 0 ? s.errors : null,
@@ -41,7 +41,7 @@ describe("agentctx: error surfacing and fiber recovery", () => {
 
       // Fiber recovery: a second user message must still produce a
       // response — the inference loop caught the error rather than dying.
-      agent.send("again");
+      agent.run("again");
       const result = await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "recovered"
@@ -87,7 +87,7 @@ describe("agentctx: error surfacing and fiber recovery", () => {
 
     const agent = createAgentRuntime({ infer, extensions: [buggyTool] });
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "done"
@@ -125,16 +125,16 @@ describe("agentctx: error surfacing and fiber recovery", () => {
 
     const agent = createAgentRuntime({ infer });
     try {
-      agent.send("one");
+      agent.run("one");
       await agent.until((s) => (s.errors.length >= 1 ? s.errors : null));
 
-      agent.send("two");
+      agent.run("two");
       const errs = await agent.until((s) =>
         s.errors.length >= 2 ? s.errors : null,
       );
       expect(errs.length).toBeGreaterThanOrEqual(2);
 
-      agent.send("three");
+      agent.run("three");
       const last = await agent.until((s) => {
         const tail = s.events.at(-1);
         return tail?.type === "assistant.message" && tail.content === "finally"

@@ -38,7 +38,7 @@ describe("agentctx: inference/projection consistency", () => {
 
     const agent = createAgentRuntime({ infer });
     try {
-      await agent.send("one");
+      await agent.run("one");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "seen=1"
@@ -46,7 +46,7 @@ describe("agentctx: inference/projection consistency", () => {
           : null;
       });
 
-      await agent.send("two");
+      await agent.run("two");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "seen=2"

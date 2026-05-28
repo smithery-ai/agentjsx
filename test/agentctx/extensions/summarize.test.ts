@@ -39,19 +39,19 @@ describe("agentctx: summarize extension", () => {
 
     try {
       // Turns 1..3 accumulate until the new-slice conv count exceeds 3.
-      agent.send("t1");
+      agent.run("t1");
       await waitForAssistantCount(agent, 1);
-      agent.send("t2");
+      agent.run("t2");
       await waitForAssistantCount(agent, 2);
-      agent.send("t3");
+      agent.run("t3");
       await waitForAssistantCount(agent, 3);
       await agent.until(() => (summarizeCalls.length >= 1 ? true : null));
 
       // Turns 4..5 keep growing past the first boundary — a second fire
       // must follow as the new slice crosses the threshold again.
-      agent.send("t4");
+      agent.run("t4");
       await waitForAssistantCount(agent, 4);
-      agent.send("t5");
+      agent.run("t5");
       await waitForAssistantCount(agent, 5);
       await agent.until(() => (summarizeCalls.length >= 2 ? true : null));
       expect(summarizeCalls.length).toBeGreaterThanOrEqual(2);
@@ -91,7 +91,7 @@ describe("agentctx: summarize extension", () => {
 
     try {
       for (let i = 0; i < 4; i++) {
-        agent.send(`turn-${i}`);
+        agent.run(`turn-${i}`);
         await waitForAssistantCount(agent, i + 1);
       }
 
@@ -139,11 +139,11 @@ describe("agentctx: summarize extension", () => {
     });
 
     try {
-      await agent.send("t1");
+      await agent.run("t1");
       await waitForAssistantCount(agent, 1);
-      await agent.send("t2");
+      await agent.run("t2");
       await waitForAssistantCount(agent, 2);
-      await agent.send("t3");
+      await agent.run("t3");
       await waitForAssistantCount(agent, 3);
 
       await summarizerCalled;
@@ -194,11 +194,11 @@ describe("agentctx: summarize extension", () => {
     });
 
     try {
-      agent.send("first");
+      agent.run("first");
       await waitForAssistantCount(agent, 1);
-      agent.send("second");
+      agent.run("second");
       await waitForAssistantCount(agent, 2);
-      agent.send("third");
+      agent.run("third");
       await waitForAssistantCount(agent, 3);
 
       const events = await agent.events();

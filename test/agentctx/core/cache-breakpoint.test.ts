@@ -67,7 +67,7 @@ describe("projection: cache-breakpoint oracle", () => {
     const { infer, seen } = capture();
     const agent = createAgentRuntime({ infer, system: "You are an agent." });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );
@@ -92,7 +92,7 @@ describe("projection: cache-breakpoint oracle", () => {
       cacheAmbient: false,
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );
@@ -127,7 +127,7 @@ describe("projection: cache-breakpoint oracle", () => {
       },
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );
@@ -167,7 +167,7 @@ describe("projection: cache-breakpoint oracle", () => {
       },
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );
@@ -195,7 +195,7 @@ describe("projection: cache-breakpoint oracle", () => {
       ],
     });
     try {
-      await agent.send("hi");
+      await agent.run("hi");
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );

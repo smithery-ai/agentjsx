@@ -88,7 +88,7 @@ describe("localWorkspace", () => {
       extensions: [localWorkspace({ root })],
     });
     try {
-      void agent.send("go");
+      void agent.run("go");
       await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" ? last : null;

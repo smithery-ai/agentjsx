@@ -140,7 +140,7 @@ describe("agentctx: mcpServers extension (http transport)", () => {
       expect(connected[0].name).toBe("test");
       expect(connected[0].count).toBe(1);
 
-      agent.send("go");
+      agent.run("go");
       const result = await agent.until((s): Event | null => {
         const hit = s.events.find(
           (e) => e.type === "tool.result" && e.tool_call_id === "c1",
@@ -168,7 +168,7 @@ describe("agentctx: mcpServers extension (http transport)", () => {
       ],
     });
     try {
-      agent.send("hi");
+      agent.run("hi");
       await agent.until((s) =>
         s.events.some((e) => e.type === "assistant.message") ? true : null,
       );

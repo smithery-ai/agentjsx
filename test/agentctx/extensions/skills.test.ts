@@ -33,7 +33,7 @@ describe("agentctx: skills extension", () => {
       extensions: [skills({ skills: CATALOG, backend })],
     });
     try {
-      agent.send("hi");
+      agent.run("hi");
       const sys = await agent.until((s) => {
         const text = typeof s.rendered.system === "string"
           ? s.rendered.system
@@ -57,7 +57,7 @@ describe("agentctx: skills extension", () => {
       extensions: [skills({ skills: CATALOG, backend })],
     });
     try {
-      agent.send("use triage");
+      agent.run("use triage");
       const result = await waitForResult(agent, "c1");
       const content = "content" in result ? result.content : "";
       expect(content).toBe(BODIES["h-triage"]);
@@ -78,7 +78,7 @@ describe("agentctx: skills extension", () => {
       extensions: [skills({ skills: CATALOG, backend })],
     });
     try {
-      agent.send("x");
+      agent.run("x");
       const result = await waitForResult(agent, "c1");
       const content = "content" in result ? result.content : "";
       expect(content).toMatch(/Unknown skill/);

@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { createAgentRuntime } from "@flamecast/agentjsx";
 import { scriptedInfer } from "../helpers/scripted-infer";
 
-// Regression: `agent.send(content)` must resolve only after the user.message
+// Regression: `agent.run(content)` must resolve only after the user.message
 // is durably in the log. A fire-and-forget send (send returning `void`)
 // caused an off-by-one in interactive consumers: a caller that did
 //
-//    agent.send(line)
+//    agent.run(line)
 //    await agent.until(s => isTerminal(s.events.at(-1)) ? true : null)
 //
 // saw `until` resolve immediately on the initial SubscriptionRef replay,
@@ -22,7 +22,7 @@ describe("agentctx: send ordering", () => {
     });
     try {
       const before = (await agent.events()).length;
-      await agent.send("hello");
+      await agent.run("hello");
       const after = await agent.events();
       // The user.message must be present at its expected slot. The
       // assistant.message may or may not have landed yet — that depends
@@ -45,7 +45,7 @@ describe("agentctx: send ordering", () => {
     });
     try {
       // Turn 1: establishes a terminal assistant.message in the log.
-      await agent.send("one");
+      await agent.run("one");
       const first = await agent.until((s) => {
         const last = s.events.at(-1);
         return last?.type === "assistant.message" && last.content === "first"
@@ -60,7 +60,7 @@ describe("agentctx: send ordering", () => {
       // the new user.message is in the log before `until` subscribes, so
       // the only terminal state that satisfies the predicate is the new
       // "second" reply.
-      await agent.send("two");
+      await agent.run("two");
       const second = await agent.until((s) => {
         const last = s.events.at(-1);
         if (last?.type !== "assistant.message") return null;

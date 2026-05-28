@@ -42,7 +42,7 @@ describe("agentctx: shell extension", () => {
   it("clamps LLM-supplied timeout above maxTimeout down to maxTimeout", async () => {
     const { agent, timeouts } = mountShell({ maxTimeout: 900_000 });
     try {
-      agent.send("go");
+      agent.run("go");
       await waitForAssistant(agent);
       expect(timeouts).toEqual([900_000]);
     } finally {
@@ -77,7 +77,7 @@ describe("agentctx: shell extension", () => {
       extensions: [shell(sh, { defaultTimeout: 60_000, maxTimeout: 900_000 })],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => {
         const count = s.events.filter((e) => e.type === "assistant.message").length;
         return count >= 5 ? true : null;
@@ -104,7 +104,7 @@ describe("agentctx: shell extension", () => {
       extensions: [shell(sh, { defaultTimeout: 60_000, maxTimeout: 900_000 })],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await waitForAssistant(agent);
       expect(timeouts).toEqual([5_000]);
     } finally {
@@ -130,7 +130,7 @@ describe("agentctx: shell extension", () => {
       extensions: [shell(sh, { cwd: "/start" })],
     });
     try {
-      agent.send("go");
+      agent.run("go");
       await agent.until((s) => {
         const count = s.events.filter((e) => e.type === "assistant.message").length;
         return count >= 4 ? true : null;

@@ -96,7 +96,7 @@ describe("jsx Compact strategy=summary e2e", () => {
       // over the 100-char threshold. Each turn adds a user-message and
       // an assistant-message fragment (~30 chars apiece).
       for (let i = 0; i < 6; i++) {
-        await agent.send(`user message number ${i} with some padding`);
+        await agent.run(`user message number ${i} with some padding`);
         await agent.until<Event>((snap) => {
           for (let j = snap.events.length - 1; j >= 0; j--) {
             const e = snap.events[j]!;
@@ -131,7 +131,7 @@ describe("jsx Compact strategy=summary e2e", () => {
       // Wait for the fire-and-forget summarization to resolve, then
       // force a re-render so the projection picks up the cached value.
       await new Promise((r) => setTimeout(r, 200));
-      await agent.send("noop");
+      await agent.run("noop");
       await agent.until<Event>((snap) => {
         for (let i = snap.events.length - 1; i >= 0; i--) {
           const e = snap.events[i]!;
@@ -240,7 +240,7 @@ describe("jsx Compact strategy=summary e2e", () => {
       // present in history. Simplest approach: drive the messages in
       // sequence and use the very last call's seenContexts entry.
       for (const { user, assistant: _ } of messageTexts) {
-        await agent.send(user);
+        await agent.run(user);
         await agent.until<Event>((snap) => {
           for (let i = snap.events.length - 1; i >= 0; i--) {
             const e = snap.events[i]!;
@@ -285,7 +285,7 @@ describe("jsx Compact strategy=summary e2e", () => {
       compactTesting.seed(realKey, "PRE-SEEDED SUMMARY");
 
       // Force one more render with the corrected seed in place.
-      await agent.send("trigger");
+      await agent.run("trigger");
       await agent.until<Event>((snap) => {
         for (let i = snap.events.length - 1; i >= 0; i--) {
           const e = snap.events[i]!;
