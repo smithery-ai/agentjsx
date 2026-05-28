@@ -11,9 +11,9 @@
 
 import { Chunk, Effect, SubscriptionRef } from "effect";
 import { describe, expect, it } from "vitest";
-import { AgentCtx, createAgentRuntime, render } from "@flamecast/agentctx";
-import { createElement, Agent, Block, Messages, Workspace } from "@flamecast/agentctx/components";
-import type { Event, InferFn, ProviderContext } from "@flamecast/agentctx";
+import { AgentCtx, createAgentRuntime, render } from "@flamecast/agentjsx";
+import { createElement, Agent, Block, Messages, Workspace } from "@flamecast/agentjsx/components";
+import type { Event, InferFn, ProviderContext } from "@flamecast/agentjsx";
 
 // `createElement` is referenced by the classic-JSX-compiled output of
 // the <Agent>...</Agent> expressions below. The explicit import keeps

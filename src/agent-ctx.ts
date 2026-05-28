@@ -442,6 +442,6 @@ export const make = (
     return service;
   });
 
-export class AgentCtx extends Effect.Service<AgentCtx>()("@flamecast/agentctx/AgentCtx", {
+export class AgentCtx extends Effect.Service<AgentCtx>()("@flamecast/agentjsx/AgentCtx", {
   scoped: (opts: AgentCtxOptions) => make(opts),
 }) {}

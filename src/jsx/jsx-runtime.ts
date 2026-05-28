@@ -2,10 +2,10 @@
 //
 //   tsconfig.json:
 //     "jsx": "react-jsx",
-//     "jsxImportSource": "@flamecast/agentctx"
+//     "jsxImportSource": "@flamecast/agentjsx"
 //
 // The TS compiler then implicitly imports `jsx` / `jsxs` / `Fragment` from
-// "@flamecast/agentctx/jsx-runtime" for every .tsx file in the project, so
+// "@flamecast/agentjsx/jsx-runtime" for every .tsx file in the project, so
 // users don't need an explicit `import { createElement }` at the top of
 // each component file.
 //

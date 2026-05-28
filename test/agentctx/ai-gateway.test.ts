@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createAiGatewayInfer } from "@flamecast/agentctx/providers";
+import { createAiGatewayInfer } from "@flamecast/agentjsx/providers";
 
 const API_KEY = "vercel-gateway-key";
 

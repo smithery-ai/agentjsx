@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime } from "@flamecast/agentctx";
+import { createAgentRuntime } from "@flamecast/agentjsx";
 import { scriptedInfer } from "../helpers/scripted-infer";
 
 // Regression: `agent.send(content)` must resolve only after the user.message

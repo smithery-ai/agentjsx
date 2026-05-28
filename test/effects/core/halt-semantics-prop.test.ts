@@ -1,9 +1,9 @@
 import fc from "fast-check";
 import { Chunk } from "effect";
 import { describe, expect, it } from "vitest";
-import { isHalted } from "@flamecast/agentctx/projections";
-import type { Event } from "@flamecast/agentctx/types";
-import type { EventInput } from "@flamecast/agentctx/event-log";
+import { isHalted } from "@flamecast/agentjsx/projections";
+import type { Event } from "@flamecast/agentjsx/types";
+import type { EventInput } from "@flamecast/agentjsx/event-log";
 
 // Algebraic property test for `isHalted` — the per-turn halt semantics
 // (projections.ts:165-181). The behavior is "scan from the end; the

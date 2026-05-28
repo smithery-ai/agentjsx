@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime, recall } from "@flamecast/agentctx";
-import type { InferFn } from "@flamecast/agentctx";
+import { createAgentRuntime, recall } from "@flamecast/agentjsx";
+import type { InferFn } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 describe("agentctx: recall extension", () => {

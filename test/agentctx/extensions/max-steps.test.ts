@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { AgentCtx, createAgentRuntime, maxSteps } from "@flamecast/agentctx";
-import type { Event, Tool } from "@flamecast/agentctx";
+import { AgentCtx, createAgentRuntime, maxSteps } from "@flamecast/agentjsx";
+import type { Event, Tool } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 const hasHalt = (s: { events: ReadonlyArray<Event> }): Event | null =>

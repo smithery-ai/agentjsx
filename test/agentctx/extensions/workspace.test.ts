@@ -5,7 +5,7 @@ import {
   workspace,
   type Shell,
   type Workspace,
-} from "@flamecast/agentctx";
+} from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 const makeWorkspace = (root: string, execOpts: { cwd: string[] }): Workspace => {

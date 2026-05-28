@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime, defineTool } from "@flamecast/agentctx";
-import type { InferFn, InferResponse, ToolCall } from "@flamecast/agentctx";
+import { createAgentRuntime, defineTool } from "@flamecast/agentjsx";
+import type { InferFn, InferResponse, ToolCall } from "@flamecast/agentjsx";
 import { Schema } from "effect";
 
 // Algebraic property test for the tool-execution protocol

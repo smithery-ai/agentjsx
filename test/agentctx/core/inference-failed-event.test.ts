@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime } from "@flamecast/agentctx";
+import { createAgentRuntime } from "@flamecast/agentjsx";
 
 // Regression: when the InferFn throws, the inference loop must append a
 // terminal `inference.failed` event to the log. Without this, callers

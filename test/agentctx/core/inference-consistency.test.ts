@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime } from "@flamecast/agentctx";
-import type { InferFn, InferResponse } from "@flamecast/agentctx";
+import { createAgentRuntime } from "@flamecast/agentjsx";
+import type { InferFn, InferResponse } from "@flamecast/agentjsx";
 
 // Regression: inference must read a ProviderContext that is consistent
 // with the log state it triggers on.

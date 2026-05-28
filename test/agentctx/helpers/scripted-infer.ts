@@ -1,4 +1,4 @@
-import type { InferFn, InferResponse, ToolCall } from "@flamecast/agentctx";
+import type { InferFn, InferResponse, ToolCall } from "@flamecast/agentjsx";
 
 export interface ScriptedStep {
   readonly content: string;

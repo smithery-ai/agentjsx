@@ -9,7 +9,7 @@ import {
   type InferFn,
   type InferResponse,
   type ProviderContext,
-} from "@flamecast/agentctx";
+} from "@flamecast/agentjsx";
 import { toolCall } from "../helpers/scripted-infer";
 
 // Flatten ProviderContext.system to a plain string so tests can

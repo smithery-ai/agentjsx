@@ -1,8 +1,8 @@
 import { Chunk } from "effect";
 import { describe, expect, it } from "vitest";
-import { findSafeCompactionToSeq } from "@flamecast/agentctx/compaction";
-import { renderHistoryFragments } from "@flamecast/agentctx";
-import type { Fragment, Event, ToolCall } from "@flamecast/agentctx";
+import { findSafeCompactionToSeq } from "@flamecast/agentjsx/compaction";
+import { renderHistoryFragments } from "@flamecast/agentjsx";
+import type { Fragment, Event, ToolCall } from "@flamecast/agentjsx";
 
 // Tool-call atomicity: every `core/tool-result` fragment must follow an
 // `core/assistant-message` whose `toolCalls` contain its `toolCallId`.

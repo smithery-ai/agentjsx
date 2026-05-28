@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime, skills } from "@flamecast/agentctx";
-import type { Event } from "@flamecast/agentctx";
+import { createAgentRuntime, skills } from "@flamecast/agentjsx";
+import type { Event } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 const CATALOG = [

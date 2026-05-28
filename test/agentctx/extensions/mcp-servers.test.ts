@@ -11,8 +11,8 @@ import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
-import { createAgentRuntime, mcpServers } from "@flamecast/agentctx";
-import type { Event, InferFn } from "@flamecast/agentctx";
+import { createAgentRuntime, mcpServers } from "@flamecast/agentjsx";
+import type { Event, InferFn } from "@flamecast/agentjsx";
 
 interface ServerHandle {
   url: string;

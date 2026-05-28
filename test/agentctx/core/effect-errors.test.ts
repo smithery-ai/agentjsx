@@ -5,8 +5,8 @@ import {
   createAgentRuntime,
   InferenceError,
   ToolExecutionError,
-} from "@flamecast/agentctx";
-import type { Extension, InferFn, InferResponse } from "@flamecast/agentctx";
+} from "@flamecast/agentjsx";
+import type { Extension, InferFn, InferResponse } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 describe("agentctx: error surfacing and fiber recovery", () => {

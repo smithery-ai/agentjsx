@@ -38,9 +38,9 @@ const LINKS = [
 		desc: "Source, issues, and the full extension catalog.",
 	},
 	{
-		href: "https://www.npmjs.com/package/@flamecast/agentctx",
+		href: "https://www.npmjs.com/package/@flamecast/agentjsx",
 		label: "npm",
-		desc: "Install with bun add @flamecast/agentctx.",
+		desc: "Install with bun add @flamecast/agentjsx.",
 	},
 	{
 		href: "https://github.com/smithery-ai/agentctx/tree/main/examples",

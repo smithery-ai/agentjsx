@@ -1,12 +1,12 @@
 # agentctx
 
 ```tsx
-import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentctx"
+import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
 import {
   Agent, Block, Messages,
   Workspace, Skills, McpServer,
   Todo, Errors, GitState,
-} from "@flamecast/agentctx/components"
+} from "@flamecast/agentjsx/components"
 
 const agent = createAgentRuntime({
   infer: createAiGatewayInfer({ model: "anthropic/claude-sonnet-4-6" }),
@@ -45,7 +45,7 @@ The runtime walks the tree every turn, diffs against the previous render, and ap
 ## Install
 
 ```bash
-bun add @flamecast/agentctx
+bun add @flamecast/agentjsx
 ```
 
 Built on [Effect](https://effect.website). Runs on Node, Cloudflare Workers, or any V8 runtime.

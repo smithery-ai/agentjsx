@@ -6,8 +6,8 @@ import {
   localWorkspace,
   nodeFileStore,
   nodeShell,
-} from "@flamecast/agentctx/node";
-import { createAgentRuntime } from "@flamecast/agentctx";
+} from "@flamecast/agentjsx/node";
+import { createAgentRuntime } from "@flamecast/agentjsx";
 import { scriptedInfer } from "../helpers/scripted-infer";
 
 let root: string;
