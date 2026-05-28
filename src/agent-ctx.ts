@@ -18,6 +18,7 @@ import type {
   Event,
   Fragment,
   FragmentMap,
+  InferFn,
   ProviderContext,
   Rendered,
   TextDelta,
@@ -114,6 +115,12 @@ export interface AgentCtxOptions {
   // the real runner, calls throw — render() walks during construction
   // shouldn't be invoking it, so the placeholder is a fine fallback.
   readonly runEffect?: <A, E>(eff: Effect.Effect<A, E, never>) => Promise<A>;
+  // Inference function exposed to capability components via the JSX
+  // RenderContext. Optional because AgentCtx is also used standalone in
+  // tests that never invoke inference; when absent, components that
+  // call `ctx.infer` fail at use time with a clear message. Wired by
+  // `createAgentRuntime` from `AgentOptions.infer`.
+  readonly infer?: InferFn;
 }
 
 export interface AgentCtxService {
@@ -202,6 +209,17 @@ export const make = (
         Promise.reject(
           new Error(
             "AgentCtx.runEffect invoked before the runtime was wired. This indicates the AgentCtx was built without `createAgentRuntime`.",
+          ),
+        ));
+    // Stub matches the `runEffect` placeholder shape: rejects only on
+    // invocation so AgentCtx use cases that never touch `ctx.infer`
+    // (most tests, ambient-only renders) keep working unchanged.
+    const infer: InferFn =
+      opts.infer ??
+      (() =>
+        Promise.reject(
+          new Error(
+            "AgentCtx.infer invoked but no inferFn was provided. Wire `createAgentRuntime({ infer })` to expose inference to capability components.",
           ),
         ));
 
@@ -345,7 +363,7 @@ export const make = (
         // catch the throw and surface it via reportError so the render
         // fiber stays alive.
         const renderedExit = yield* Effect.sync(() => {
-          _setExternalContext({ events: eventsArr, runEffect });
+          _setExternalContext({ events: eventsArr, runEffect, infer });
           try {
             return { ok: true as const, value: contextFn() };
           } catch (err) {

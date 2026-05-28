@@ -204,6 +204,7 @@ export const createAgentRuntime = (opts: AgentOptions): Agent => {
     initialTools: opts.tools,
     initialEvents: opts.initialEvents,
     runEffect,
+    infer: opts.infer,
     ...(opts.cacheAmbient !== undefined ? { cacheAmbient: opts.cacheAmbient } : {}),
     ...(opts.renderer ? { renderer: opts.renderer } : {}),
     ...(opts.context ? { context: opts.context } : {}),

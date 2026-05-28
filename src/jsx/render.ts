@@ -7,7 +7,7 @@
 // intrinsics keeps the contract narrow and the failure mode obvious.
 
 import type { Effect } from "effect";
-import type { Event, Fragment as RenderedFragment, Rendered, Tool } from "../types";
+import type { Event, Fragment as RenderedFragment, InferFn, Rendered, Tool } from "../types";
 import {
   type ComponentFunction,
   type Element,
@@ -35,6 +35,11 @@ export interface RenderContext {
   // Effect can still run; capability components that require platform
   // services will fail at use time with a service-not-found error.
   readonly runEffect: <A, E>(eff: Effect.Effect<A, E, never>) => Promise<A>;
+  // Invoke the agent's inference function. Capability components use
+  // this for things like LLM-driven summarization inside <Compact
+  // strategy="summary">. The signature mirrors AgentOptions.infer
+  // exactly so callers can pass a ProviderContext they constructed.
+  readonly infer: InferFn;
 }
 
 // Default runEffect used when render() is invoked outside the agent
@@ -47,6 +52,18 @@ const defaultRunEffect = <A, E>(_eff: Effect.Effect<A, E, never>): Promise<A> =>
     ),
   );
 };
+
+// Default infer used when render() is invoked outside the agent
+// runtime, or when the agent was constructed without an inferFn (e.g.
+// unit tests that exercise render walks in isolation). Rejects on
+// invocation so capability components that need LLM access fail with
+// a clear message rather than silently misbehaving.
+const defaultInfer: InferFn = () =>
+  Promise.reject(
+    new Error(
+      "infer called outside an agent runtime. Capability components that drive inference (e.g. <Compact strategy=\"summary\">) require a real agent constructed via `createAgentRuntime`.",
+    ),
+  );
 
 let currentContext: RenderContext | null = null;
 // External context, set by the runtime around a user-supplied
@@ -81,7 +98,7 @@ export function render(root: Node, context?: RenderContext): Rendered {
   // external context, otherwise default to an empty events context.
   currentContext =
     context ??
-    externalContext ?? { events: [], runEffect: defaultRunEffect };
+    externalContext ?? { events: [], runEffect: defaultRunEffect, infer: defaultInfer };
   try {
     walk(root, collector);
   } finally {

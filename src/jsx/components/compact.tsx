@@ -20,14 +20,21 @@
 // dependency at render time. If the shapes diverge later we can refactor
 // the extensions to export a pure helper.
 //
-// `summary` strategy is intentionally NOT included in this PR — that
-// shape requires async LLM work (the `summarize` extension forks a fiber
-// against `ctx.rendered.changes`) which doesn't fit the synchronous
-// render walk. Deferred.
+// `summary` strategy: same render walk is synchronous, but we use the
+// fire-and-forget cache pattern (mirrors `<Skills>` and `<McpServer>`)
+// to drive an async LLM summarization in the background. First render
+// of an over-threshold history emits the old fragments + a marker; the
+// next natural render after inference resolves sees the cache hot and
+// swaps the old fragments for a single summary block.
 
-import type { Fragment as RenderedFragment } from "../../types";
+import { createHash } from "node:crypto";
+import type {
+  Fragment as RenderedFragment,
+  InferFn,
+  ProviderContext,
+} from "../../types";
 import { emitFragment, emitTool, type Element, type Node } from "../runtime";
-import { renderChildren } from "../render";
+import { renderChildren, useRenderContext } from "../render";
 
 export type CompactProps =
   | {
@@ -49,6 +56,15 @@ export type CompactProps =
       // Per-fragment character cap. Each message-shaped fragment whose
       // content exceeds this is clipped to `limit` chars with a suffix.
       readonly limit: number;
+      readonly children?: Node | ReadonlyArray<Node>;
+    }
+  | {
+      readonly strategy: "summary";
+      // Total-character threshold over the message-shaped subset. When
+      // the sum of `content.length` exceeds this, the older half is
+      // summarized via the agent's `infer` and replaced by a single
+      // system block on the next render.
+      readonly threshold: number;
       readonly children?: Node | ReadonlyArray<Node>;
     };
 
@@ -153,6 +169,135 @@ function applyClipMessages(
   });
 }
 
+// Module-level cache of summarized fragment ranges. Key is a stable
+// sha256 (truncated) over the concatenated content of the "old half"
+// of fragments at the moment summarization was kicked off. Value:
+//   - "summarizing": fire-and-forget inference is in flight.
+//   - string: the cached summary text, ready to replace the old half.
+// Lifetime: module scope. Multiple agents in the same process share
+// the cache — same history slice produces the same summary regardless
+// of which agent triggered it. sha256 is overkill for collision
+// resistance at our scale (~thousands of entries) but it's bulletproof,
+// has ~no measurable perf cost compared with the LLM call that follows,
+// and avoids the "did I get the FNV constants right" footgun.
+const summaryCache = new Map<string, "summarizing" | string>();
+
+function hashFragments(fragments: ReadonlyArray<RenderedFragment>): string {
+  const h = createHash("sha256");
+  for (const f of fragments) {
+    h.update(f.tag);
+    h.update("\0");
+    h.update(f.source);
+    h.update("\0");
+    h.update(f.content);
+    h.update("\0");
+  }
+  return h.digest("hex").slice(0, 16);
+}
+
+async function runSummarization(
+  oldFragments: ReadonlyArray<RenderedFragment>,
+  infer: InferFn,
+): Promise<string> {
+  const serialized = oldFragments
+    .map((f) => `[${f.source}] ${f.content}`)
+    .join("\n\n");
+
+  const summaryContext: ProviderContext = {
+    system:
+      "You compress conversation history for context preservation. " +
+      "Summarize the following snippet in 3-5 sentences, preserving: " +
+      "(1) decisions made, (2) code or files modified, (3) open " +
+      "questions or pending work. Be terse: the summary will be " +
+      "re-fed to the same agent on its next turn.",
+    messages: [{ role: "user", content: serialized }],
+    tools: [],
+  };
+
+  const response = await infer(summaryContext);
+  // `InferResponse.content` is typed as `string`; defend against a
+  // provider returning an array-shaped payload anyway.
+  const c = response.content as unknown;
+  if (typeof c === "string") return c;
+  if (Array.isArray(c)) {
+    return c
+      .map((chunk) => {
+        if (typeof chunk === "string") return chunk;
+        if (chunk && typeof chunk === "object" && "text" in chunk) {
+          const t = (chunk as { text?: unknown }).text;
+          return typeof t === "string" ? t : "";
+        }
+        return "";
+      })
+      .join("");
+  }
+  return String(c ?? "");
+}
+
+// Strategy: summary. Mirrors `<Skills>` / `<McpServer>` fire-and-forget
+// shape. First render of an over-threshold history kicks off
+// summarization and emits old fragments + a marker; once the cache is
+// hot, the old fragments are swapped out for a single summary block.
+function applyCompactSummary(
+  messages: ReadonlyArray<RenderedFragment>,
+  threshold: number,
+  infer: InferFn,
+): ReadonlyArray<RenderedFragment> {
+  const totalLen = messages.reduce((sum, f) => sum + f.content.length, 0);
+  if (totalLen <= threshold) return messages;
+
+  const split = Math.floor(messages.length / 2);
+  if (split === 0) return messages;
+
+  let oldHalf = messages.slice(0, split);
+  let recent = messages.slice(split);
+  // Mirror snip's orphan-trim: a `recent` head leading with
+  // `core/tool-result` would be invalid once its parent assistant
+  // message is summarized away. Move leading orphan tool-results into
+  // the old half so the recent slice stays provider-valid.
+  while (recent.length > 0 && recent[0].tag === "core/tool-result") {
+    oldHalf = [...oldHalf, recent[0]];
+    recent = recent.slice(1);
+  }
+
+  const key = hashFragments(oldHalf);
+  const cached = summaryCache.get(key);
+
+  if (typeof cached === "string") {
+    const marker: RenderedFragment = {
+      tag: "core/system",
+      source: "compact/summary",
+      content: `[summary of ${oldHalf.length} earlier turn${oldHalf.length === 1 ? "" : "s"}]\n${cached}`,
+    };
+    return [marker, ...recent];
+  }
+
+  if (cached === undefined) {
+    summaryCache.set(key, "summarizing");
+    void runSummarization(oldHalf, infer)
+      .then((summary) => {
+        summaryCache.set(key, summary);
+      })
+      .catch((err: unknown) => {
+        // Clear so the next render retries instead of getting stuck on
+        // a permanent "summarizing" marker.
+        summaryCache.delete(key);
+        console.warn(
+          "[Compact summary] inference failed:",
+          err instanceof Error ? err.message : String(err),
+        );
+      });
+  }
+
+  const marker: RenderedFragment = {
+    tag: "core/system",
+    source: "compact/summary",
+    content:
+      "[summarizing earlier turns into a digest — the summary will appear on the next render]",
+  };
+  return [...oldHalf, marker, ...recent];
+}
+
 export function Compact(props: CompactProps): Node {
   const inner = renderChildren(
     (props.children ?? []) as Node | ReadonlyArray<Node>,
@@ -182,6 +327,11 @@ export function Compact(props: CompactProps): Node {
     case "clip-messages":
       transformed = applyClipMessages(messages, props.limit);
       break;
+    case "summary": {
+      const { infer } = useRenderContext();
+      transformed = applyCompactSummary(messages, props.threshold, infer);
+      break;
+    }
   }
 
   const emits: Element[] = [
@@ -191,3 +341,21 @@ export function Compact(props: CompactProps): Node {
   ];
   return emits as Node;
 }
+
+// Test-only escape hatch for the summary-strategy module cache. Not
+// part of the public API; do not import in user code. Mirrors the
+// shape used by `<McpServer>` so stage 3 tests can reset between cases
+// and pre-seed cached summaries to exercise the hot path without an
+// LLM round trip.
+export const __testing__ = {
+  reset(): void {
+    summaryCache.clear();
+  },
+  seed(key: string, summary: string): void {
+    summaryCache.set(key, summary);
+  },
+  hashFragments,
+  peek(key: string): "summarizing" | string | undefined {
+    return summaryCache.get(key);
+  },
+};
