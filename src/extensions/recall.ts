@@ -222,5 +222,11 @@ const eventContent = (e: Event): string => {
       return e.text;
     case "todo.completed":
       return `[todo.completed index=${e.index}]`;
+    case "subagent.started":
+      return `[subagent.started id=${e.id}] ${e.prompt}`;
+    case "subagent.completed":
+      return `[subagent.completed id=${e.id}] ${e.content}`;
+    case "subagent.failed":
+      return `[subagent.failed id=${e.id}] ${e.error}`;
   }
 };
