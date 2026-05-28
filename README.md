@@ -48,6 +48,41 @@ const agent = createAgentRuntime({
 await agent.run("Find the latest bug in Linear and open a PR fixing it.")
 ```
 
+## Build your own component
+
+A component is a function that returns one or more emits. Three shapes:
+
+- **Content** — emits prompt fragments (`<Block>`, `<Messages>`).
+- **Capability** — emits tools and optionally a fragment describing them (`<Workspace>`, `<Subagent>`).
+- **Shaper** — wraps children and transforms what they emit (`<Compact>`).
+
+A minimal capability:
+
+```tsx
+import { Schema } from "effect"
+import { defineTool } from "@flamecast/agentjsx"
+import { emitFragment, emitTool } from "@flamecast/agentjsx/components"
+
+export function Clock() {
+  const now = defineTool({
+    name: "now",
+    description: "Return the current ISO timestamp.",
+    parameters: Schema.Struct({}),
+    run: async () => new Date().toISOString(),
+  })
+  return [
+    emitTool(now),
+    emitFragment({
+      tag: "core/system",
+      source: "clock",
+      content: "<clock>(call `now` for the current time)</clock>",
+    }),
+  ]
+}
+```
+
+Drop `<Clock />` anywhere inside `<Agent>` and the model gets a `now` tool plus a one-line system block describing it. Tools are reconciled by name across renders — same name, no churn.
+
 ## Runtimes
 
 ```ts
