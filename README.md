@@ -9,6 +9,7 @@ bun add @flamecast/agentjsx
 ```
 
 ## Quickstart
+Build a claude code like harness in a few lines of code:
 
 ```tsx
 import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
