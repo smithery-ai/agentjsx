@@ -1,18 +1,29 @@
 # REPL example
 
-Interactive prompt to reply loop against an agentjsx agent. The simplest end-to-end demo: type a message, watch tool calls and assistant replies stream into your terminal, with real filesystem and shell access via `@effect/platform-node`.
+Interactive prompt to reply loop against an agentjsx agent, plus a one-shot non-interactive mode for scripting and e2e verification. Real filesystem and shell access via `@effect/platform-node`.
 
 ```bash
 cd examples/repl
 pnpm install
+
+# Interactive REPL
 AI_GATEWAY_API_KEY=sk-... pnpm start
+
+# One-shot — pass the prompt as an argument
+AI_GATEWAY_API_KEY=sk-... pnpm start "list every TODO in src/"
+
+# One-shot — pipe prompt via stdin
+echo "what's in the workspace?" | AI_GATEWAY_API_KEY=sk-... pnpm start --stdin
 ```
 
-Or under Infisical (Smithery contributors with workspace access):
+Under Infisical (Smithery contributors with workspace access):
 
 ```bash
-infisical run --silent -- pnpm start
+infisical run --silent -- pnpm start                          # interactive
+infisical run --silent -- pnpm start "fix the typo in README" # one-shot
 ```
+
+In one-shot mode the program sends the prompt, waits for the terminal assistant turn, prints the reply (with tool-call commentary), and exits cleanly. Same agent, same JSX context, just no readline loop.
 
 You'll see something like:
 

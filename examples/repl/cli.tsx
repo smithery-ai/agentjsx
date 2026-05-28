@@ -1,12 +1,16 @@
-// Interactive agentjsx REPL.
+// agentjsx CLI — interactive REPL or one-shot non-interactive mode.
 //
-// Run from this directory:
-//
+// Interactive (default, no args):
 //   AI_GATEWAY_API_KEY=... npx tsx cli.tsx
-//
-// or under Infisical (Smithery contributors):
-//
 //   infisical run --silent -- npx tsx cli.tsx
+//
+// Non-interactive (positional args = prompt):
+//   npx tsx cli.tsx "list every TODO in src/"
+//   echo "fix the bug" | npx tsx cli.tsx --stdin
+//
+// In non-interactive mode the program sends the prompt, waits for the
+// terminal assistant turn, prints the reply, and exits cleanly. Useful for
+// scripting + e2e verification.
 //
 // The program is wrapped in `NodeRuntime.runMain`, which owns SIGINT/SIGTERM
 // handling and closes the scope (running finalizers) on shutdown. The
@@ -116,6 +120,24 @@ const program = Effect.gen(function* () {
 	// catches SIGINT/SIGTERM, when the program returns, or when it dies.
 	yield* Effect.addFinalizer(() => Effect.promise(() => agent.dispose()))
 
+	// Mode discrimination: if argv has a prompt, run once and exit.
+	// `--stdin` reads the prompt from stdin (for piped input).
+	const args = process.argv.slice(2)
+	const useStdin = args.includes("--stdin")
+	const positional = args.filter((a) => !a.startsWith("--")).join(" ").trim()
+
+	if (positional || useStdin) {
+		const prompt = useStdin
+			? (yield* Effect.promise(() => readAllStdin())).trim()
+			: positional
+		if (!prompt) {
+			return yield* Effect.die(new Error("Empty prompt (positional args or --stdin)."))
+		}
+		yield* Effect.promise(() => turn(agent, prompt))
+		return
+	}
+
+	// Interactive REPL mode.
 	const rl: ReadlineInterface = createInterface({
 		input: process.stdin,
 		output: process.stdout,
@@ -140,5 +162,11 @@ const program = Effect.gen(function* () {
 		yield* Console.log("")
 	}
 }).pipe(Effect.scoped)
+
+async function readAllStdin(): Promise<string> {
+	const chunks: Buffer[] = []
+	for await (const chunk of process.stdin) chunks.push(chunk as Buffer)
+	return Buffer.concat(chunks).toString("utf8")
+}
 
 NodeRuntime.runMain(program)
