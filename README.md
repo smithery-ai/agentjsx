@@ -14,7 +14,7 @@ bun add @flamecast/agentjsx
 import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
 import {
   Agent, Block, Messages,
-  Workspace, Skills, McpServer, Todo,
+  Workspace, Skills, McpServer, Todo, Subagent,
   Compact,
 } from "@flamecast/agentjsx/components"
 import { NodeContext } from "@flamecast/agentjsx/node"
@@ -34,6 +34,9 @@ const agent = createAgentRuntime({
         headers={{ Authorization: `Bearer ${process.env.LINEAR_API_KEY}` }}
       />
       <Todo />
+      <Subagent>
+        <Workspace root="./" />
+      </Subagent>
       <Compact strategy="summary" threshold={4000}>
         <Messages />
       </Compact>
