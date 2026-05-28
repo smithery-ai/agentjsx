@@ -2,7 +2,7 @@
   "name": "@flamecast/agentjsx",
   "version": "0.1.0",
   "description": "Compose your agent's context like a React tree. JSX-driven LLM context with composable capability components on Effect.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": "Arjun Kumar",
   "type": "module",
   "repository": {

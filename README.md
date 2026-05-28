@@ -44,10 +44,30 @@ const agent = createAgentRuntime({
 await agent.run("Find the latest bug in Linear and open a PR fixing it.")
 ```
 
+## Runtimes
+
+```ts
+// Node
+import { NodeContext, NodeRuntime } from "@flamecast/agentjsx/node"
+createAgentRuntime({ platform: NodeContext.layer, ... })
+NodeRuntime.runMain(program)
+
+// Bun
+import { BunContext, BunRuntime } from "@flamecast/agentjsx/platforms/bun"
+createAgentRuntime({ platform: BunContext.layer, ... })
+BunRuntime.runMain(program)
+
+// Browser — Workspace tools work via just-bash (in-memory VFS + bash interpreter)
+import { justBashPlatform } from "@flamecast/agentjsx/platforms/browser"
+createAgentRuntime({ platform: justBashPlatform({ files: { "/README.md": "..." } }), ... })
+```
+
+Node and Bun get real `bash` + native filesystem. Browser gets a POSIX-subset bash and an in-memory VFS via [`just-bash`](https://github.com/vercel-labs/just-bash) — no system binaries, but pipes, grep, awk, sed, find all work against files you seed into the VFS.
+
 ## Examples
 
 - [`examples/repl/`](examples/repl/): interactive REPL against the agent. Type a message, watch tool calls + replies stream in.
 
 ## License
 
-MIT.
+Apache 2.0.
