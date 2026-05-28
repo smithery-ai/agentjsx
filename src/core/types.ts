@@ -108,6 +108,18 @@ export type Event = { seq: number } & (
   // these events at render time to derive the current items list.
   | { readonly type: "todo.added"; readonly text: string }
   | { readonly type: "todo.completed"; readonly index: number }
+  // Background subagent lifecycle. Emitted by the `<Subagent>` component's
+  // tools. `subagent.started` is appended atomically with the
+  // `spawn_agent` tool's result; the spawn fires a forked task on the
+  // parent's ManagedRuntime that runs the child, then appends either
+  // `subagent.completed` or `subagent.failed` directly to the parent's
+  // log when the child finishes. The `<Subagent>` block reduces over
+  // these events at render time to surface in-flight subagents to the
+  // model. None project to the message stream — the model sees status
+  // via the ambient block and via `check_agent` tool results.
+  | { readonly type: "subagent.started"; readonly id: string; readonly prompt: string }
+  | { readonly type: "subagent.completed"; readonly id: string; readonly content: string }
+  | { readonly type: "subagent.failed"; readonly id: string; readonly error: string }
 );
 
 // Fragments are the LLM-facing projection of events + extension contributions,

@@ -105,6 +105,12 @@ const buildLog = (shapes: ReadonlyArray<EventInput>): Event[] =>
         return { seq: i, type: "todo.added", text: s.text };
       case "todo.completed":
         return { seq: i, type: "todo.completed", index: s.index };
+      case "subagent.started":
+        return { seq: i, type: "subagent.started", id: s.id, prompt: s.prompt };
+      case "subagent.completed":
+        return { seq: i, type: "subagent.completed", id: s.id, content: s.content };
+      case "subagent.failed":
+        return { seq: i, type: "subagent.failed", id: s.id, error: s.error };
     }
   });
 

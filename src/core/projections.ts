@@ -67,6 +67,9 @@ export const EVENT_META: { readonly [K in Event["type"]]: EventMeta } = {
   "compaction.summary": { projectable: false, hiddenByRecall: true,  structural: true  },
   "todo.added":         { projectable: false, hiddenByRecall: true,  structural: true  },
   "todo.completed":     { projectable: false, hiddenByRecall: true,  structural: true  },
+  "subagent.started":   { projectable: false, hiddenByRecall: true,  structural: true  },
+  "subagent.completed": { projectable: false, hiddenByRecall: true,  structural: true  },
+  "subagent.failed":    { projectable: false, hiddenByRecall: true,  structural: true  },
 };
 
 const PROJECTORS: ProjectorTable = {
@@ -121,6 +124,12 @@ const PROJECTORS: ProjectorTable = {
   // surface as messages in the history stream.
   "todo.added": () => null,
   "todo.completed": () => null,
+  // Subagent lifecycle is internal state for the <Subagent> ambient
+  // block — never projected to the message stream. The model observes
+  // these via the ambient block + `check_agent` tool results.
+  "subagent.started": () => null,
+  "subagent.completed": () => null,
+  "subagent.failed": () => null,
 };
 
 // Project a single event to its LLM-facing fragment, or `null` for events

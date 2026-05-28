@@ -8,3 +8,4 @@ export { Todo } from "./todo";
 export { Skills } from "./skills";
 export { Compact } from "./compact";
 export { McpServer } from "./mcp";
+export { Subagent } from "./subagent";
