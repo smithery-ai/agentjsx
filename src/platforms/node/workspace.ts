@@ -1,5 +1,5 @@
-import type { Extension } from "../agent";
-import { workspace, type WorkspaceOptions } from "../extensions/workspace";
+import type { Extension } from "../../core/agent";
+import { workspace, type WorkspaceOptions } from "../../extensions/workspace";
 import { nodeFileStore } from "./file-store";
 import { nodeShell } from "./shell";
 

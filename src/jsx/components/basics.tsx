@@ -7,8 +7,8 @@
 // uniform across the directory.
 
 import { Chunk } from "effect";
-import { renderHistoryFragments } from "../../projections";
-import type { Event, Fragment as RenderedFragment } from "../../types";
+import { renderHistoryFragments } from "../../core/projections";
+import type { Event, Fragment as RenderedFragment } from "../../core/types";
 import { emitFragment } from "../runtime";
 import type { Element, Node } from "../runtime";
 import { useRenderContext } from "../render";

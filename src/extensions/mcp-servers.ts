@@ -1,7 +1,7 @@
 import { Effect, Layer, Scope } from "effect";
-import { AgentCtx, type AgentCtxService } from "../agent-ctx";
-import type { Extension } from "../agent";
-import type { Tool } from "../types";
+import { AgentCtx, type AgentCtxService } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import type { Tool } from "../core/types";
 import { addToolReporting } from "./tool-registration";
 
 // Spec for one MCP server the harness should connect to.

@@ -10,7 +10,7 @@ import {
 } from "effect";
 import { DuplicateToolError } from "./errors";
 import { makeEventLog, type EventLog } from "./event-log";
-import { _clearExternalContext, _setExternalContext } from "./jsx/render";
+import { _clearExternalContext, _setExternalContext } from "../jsx/render";
 import { renderHistoryFragments } from "./projections";
 import { adaptToProviderContext } from "./render-adapter";
 import type {

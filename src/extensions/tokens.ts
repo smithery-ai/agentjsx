@@ -1,4 +1,4 @@
-import type { Fragment, ProviderContext } from "../types";
+import type { Fragment, ProviderContext } from "../core/types";
 
 // Rough character-to-token ratio. ~4 chars/token is a common first
 // approximation for English text — used by Anthropic's and OpenAI's

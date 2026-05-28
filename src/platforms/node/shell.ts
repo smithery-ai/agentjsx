@@ -1,6 +1,6 @@
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
-import type { Shell } from "../extensions/shell";
+import type { Shell } from "../../extensions/shell";
 
 const execAsync = promisify(exec);
 

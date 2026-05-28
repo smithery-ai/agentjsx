@@ -14,7 +14,7 @@
 // `emitTool`. The walker recognizes the shape and pushes into the
 // collector instead of treating the value as a child.
 
-import type { Fragment as RenderedFragment, Tool } from "../types";
+import type { Fragment as RenderedFragment, Tool } from "../core/types";
 
 export type ComponentFunction = (props: Record<string, unknown>) => Node;
 

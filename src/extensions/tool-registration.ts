@@ -1,7 +1,7 @@
 import { Effect, type Scope } from "effect";
-import type { AgentCtxService } from "../agent-ctx";
-import { defineTool, type DefineToolOptions } from "../define-tool";
-import type { Tool } from "../types";
+import type { AgentCtxService } from "../core/agent-ctx";
+import { defineTool, type DefineToolOptions } from "../core/define-tool";
+import type { Tool } from "../core/types";
 
 // Extensions register tools via `ctx.addTool`, which fails with
 // DuplicateToolError when two extensions share a name. Extensions

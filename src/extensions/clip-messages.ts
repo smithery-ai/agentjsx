@@ -1,7 +1,7 @@
 import { Effect, Layer } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
-import type { Fragment } from "../types";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import type { Fragment } from "../core/types";
 
 export interface ClipMessagesOptions {
   // Cap any single block's content at this many characters. Default

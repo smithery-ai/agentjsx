@@ -1,6 +1,6 @@
 import { Effect, Layer, Schema } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
 import { registerTool } from "./tool-registration";
 
 // One discoverable skill — a directory on disk with a SKILL.md whose

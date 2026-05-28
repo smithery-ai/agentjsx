@@ -7,7 +7,7 @@
 // intrinsics keeps the contract narrow and the failure mode obvious.
 
 import type { Effect } from "effect";
-import type { Event, Fragment as RenderedFragment, InferFn, Rendered, Tool } from "../types";
+import type { Event, Fragment as RenderedFragment, InferFn, Rendered, Tool } from "../core/types";
 import {
   type ComponentFunction,
   type Element,

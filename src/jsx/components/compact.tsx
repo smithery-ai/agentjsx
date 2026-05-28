@@ -32,7 +32,7 @@ import type {
   Fragment as RenderedFragment,
   InferFn,
   ProviderContext,
-} from "../../types";
+} from "../../core/types";
 import { emitFragment, emitTool, type Element, type Node } from "../runtime";
 import { renderChildren, useRenderContext } from "../render";
 

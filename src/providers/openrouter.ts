@@ -9,7 +9,7 @@ import type {
   InferFn,
   InferResponse,
   ProviderOptions,
-} from "../types";
+} from "../core/types";
 
 import {
   DEFAULT_COST_PER_1K,

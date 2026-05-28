@@ -1,7 +1,7 @@
 import { Chunk, Effect, Layer, Schema, Scope, SubscriptionRef } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
-import type { Event, ProviderContext, Tool, InferFn } from "../types";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import type { Event, ProviderContext, Tool, InferFn } from "../core/types";
 import { inProcessBackend } from "./in-process-backend";
 import { registerTool } from "./tool-registration";
 

@@ -33,13 +33,17 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./core": {
+      "types": "./src/core/index.ts",
+      "default": "./src/core/index.ts"
+    },
     "./agent": {
-      "types": "./src/agent.ts",
-      "default": "./src/agent.ts"
+      "types": "./src/core/agent.ts",
+      "default": "./src/core/agent.ts"
     },
     "./agent-ctx": {
-      "types": "./src/agent-ctx.ts",
-      "default": "./src/agent-ctx.ts"
+      "types": "./src/core/agent-ctx.ts",
+      "default": "./src/core/agent-ctx.ts"
     },
     "./components": {
       "types": "./src/jsx/index.ts",
@@ -54,20 +58,20 @@
       "default": "./src/jsx/jsx-runtime.ts"
     },
     "./compaction": {
-      "types": "./src/compaction.ts",
-      "default": "./src/compaction.ts"
+      "types": "./src/core/compaction.ts",
+      "default": "./src/core/compaction.ts"
     },
     "./define-tool": {
-      "types": "./src/define-tool.ts",
-      "default": "./src/define-tool.ts"
+      "types": "./src/core/define-tool.ts",
+      "default": "./src/core/define-tool.ts"
     },
     "./errors": {
-      "types": "./src/errors.ts",
-      "default": "./src/errors.ts"
+      "types": "./src/core/errors.ts",
+      "default": "./src/core/errors.ts"
     },
     "./event-log": {
-      "types": "./src/event-log.ts",
-      "default": "./src/event-log.ts"
+      "types": "./src/core/event-log.ts",
+      "default": "./src/core/event-log.ts"
     },
     "./extensions": {
       "types": "./src/extensions/index.ts",
@@ -78,28 +82,44 @@
       "default": "./src/extensions/*.ts"
     },
     "./node": {
-      "types": "./src/node/index.ts",
-      "default": "./src/node/index.ts"
+      "types": "./src/platforms/node/index.ts",
+      "default": "./src/platforms/node/index.ts"
     },
     "./node/*": {
-      "types": "./src/node/*.ts",
-      "default": "./src/node/*.ts"
+      "types": "./src/platforms/node/*.ts",
+      "default": "./src/platforms/node/*.ts"
+    },
+    "./platforms/bun": {
+      "types": "./src/platforms/bun/index.ts",
+      "default": "./src/platforms/bun/index.ts"
+    },
+    "./platforms/browser": {
+      "types": "./src/platforms/browser/index.ts",
+      "default": "./src/platforms/browser/index.ts"
+    },
+    "./platforms/worker": {
+      "types": "./src/platforms/worker/index.ts",
+      "default": "./src/platforms/worker/index.ts"
+    },
+    "./platforms/cloudflare": {
+      "types": "./src/platforms/cloudflare/index.ts",
+      "default": "./src/platforms/cloudflare/index.ts"
     },
     "./hydration": {
-      "types": "./src/hydration.ts",
-      "default": "./src/hydration.ts"
+      "types": "./src/core/hydration.ts",
+      "default": "./src/core/hydration.ts"
     },
     "./inference": {
-      "types": "./src/inference.ts",
-      "default": "./src/inference.ts"
+      "types": "./src/core/inference.ts",
+      "default": "./src/core/inference.ts"
     },
     "./pending-sends": {
-      "types": "./src/pending-sends.ts",
-      "default": "./src/pending-sends.ts"
+      "types": "./src/core/pending-sends.ts",
+      "default": "./src/core/pending-sends.ts"
     },
     "./projections": {
-      "types": "./src/projections.ts",
-      "default": "./src/projections.ts"
+      "types": "./src/core/projections.ts",
+      "default": "./src/core/projections.ts"
     },
     "./providers": {
       "types": "./src/providers/index.ts",
@@ -110,20 +130,20 @@
       "default": "./src/providers/*.ts"
     },
     "./render-adapter": {
-      "types": "./src/render-adapter.ts",
-      "default": "./src/render-adapter.ts"
+      "types": "./src/core/render-adapter.ts",
+      "default": "./src/core/render-adapter.ts"
     },
     "./tool-exec": {
-      "types": "./src/tool-exec.ts",
-      "default": "./src/tool-exec.ts"
+      "types": "./src/core/tool-exec.ts",
+      "default": "./src/core/tool-exec.ts"
     },
     "./types": {
-      "types": "./src/types.ts",
-      "default": "./src/types.ts"
+      "types": "./src/core/types.ts",
+      "default": "./src/core/types.ts"
     },
     "./validate": {
-      "types": "./src/validate.ts",
-      "default": "./src/validate.ts"
+      "types": "./src/core/validate.ts",
+      "default": "./src/core/validate.ts"
     }
   },
   "scripts": {
@@ -137,6 +157,8 @@
   },
   "peerDependencies": {
     "@effect/platform": "^0.96.1",
+    "@effect/platform-bun": "^0.89.0",
+    "@effect/platform-browser": "^0.76.0",
     "@modelcontextprotocol/sdk": "^1.25.1"
   },
   "peerDependenciesMeta": {
@@ -145,10 +167,18 @@
     },
     "@effect/platform": {
       "optional": true
+    },
+    "@effect/platform-bun": {
+      "optional": true
+    },
+    "@effect/platform-browser": {
+      "optional": true
     }
   },
   "devDependencies": {
     "@effect/platform": "^0.96.1",
+    "@effect/platform-browser": "^0.76.0",
+    "@effect/platform-bun": "^0.89.0",
     "@effect/platform-node": "^0.106.0",
     "@modelcontextprotocol/sdk": "^1.25.1",
     "@types/node": "^22.19.17",

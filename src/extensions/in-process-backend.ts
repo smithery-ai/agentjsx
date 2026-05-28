@@ -1,7 +1,7 @@
 import { Effect, Layer } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import { createAgentRuntime, type Agent, type Extension } from "../agent";
-import type { Event, InferFn } from "../types";
+import { AgentCtx } from "../core/agent-ctx";
+import { createAgentRuntime, type Agent, type Extension } from "../core/agent";
+import type { Event, InferFn } from "../core/types";
 import type { SubagentBackend, SubagentSpawnOpts, SubagentTerminal } from "./subagents";
 
 // Default in-process backend. Spawns children via `createAgentRuntime`

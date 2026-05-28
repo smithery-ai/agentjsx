@@ -1,9 +1,9 @@
 import { Chunk, Effect, Layer, Ref, Stream } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
-import { findSafeCompactionToSeq, lastCompactionEnd } from "../compaction";
-import type { Fragment, Event, ProviderContext } from "../types";
-import { eventToFragment } from "../projections";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import { findSafeCompactionToSeq, lastCompactionEnd } from "../core/compaction";
+import type { Fragment, Event, ProviderContext } from "../core/types";
+import { eventToFragment } from "../core/projections";
 import { estimateTokensFromContext } from "./tokens";
 
 export interface SummarizeOptions {

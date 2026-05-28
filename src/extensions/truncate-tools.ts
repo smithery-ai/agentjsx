@@ -1,7 +1,7 @@
 import { Effect, Layer } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
-import type { Fragment } from "../types";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import type { Fragment } from "../core/types";
 
 export interface TruncateToolsOptions {
   // Number of most-recent tool-result blocks to keep intact. Older ones

@@ -7,7 +7,7 @@ export {
   type AgentOptions,
   type AgentSnapshot,
   type Extension,
-} from "./agent";
+} from "./core/agent";
 export {
   AgentCtx,
   type AgentCtxService,
@@ -18,25 +18,25 @@ export {
   type AgentErrorEntry,
   type ProjectionInputs,
   type Renderer,
-} from "./agent-ctx";
-export { PendingSends, type PendingSendsService } from "./pending-sends";
-export { runInference } from "./inference";
-export { runToolExecution } from "./tool-exec";
+} from "./core/agent-ctx";
+export { PendingSends, type PendingSendsService } from "./core/pending-sends";
+export { runInference } from "./core/inference";
+export { runToolExecution } from "./core/tool-exec";
 export {
   isHalted,
   lastResult,
   pendingToolCallsFromLog,
   renderHistoryFragments,
   toolsInFlight,
-} from "./projections";
-export { makeEventLog, type EventLog, type EventInput } from "./event-log";
-export { reconcileHydrationDangling } from "./hydration";
+} from "./core/projections";
+export { makeEventLog, type EventLog, type EventInput } from "./core/event-log";
+export { reconcileHydrationDangling } from "./core/hydration";
 export {
   DuplicateToolError,
   InferenceError,
   ToolExecutionError,
   type AgentError,
-} from "./errors";
+} from "./core/errors";
 export type {
   Fragment,
   FragmentMap,
@@ -53,7 +53,7 @@ export type {
   ToolCall,
   ToolContext,
   ToolDefinition,
-} from "./types";
+} from "./core/types";
 // JSX-context API root-level entry. Components live under
 // `effectctx/components` (per the package.json exports map); the
 // `render` function and types are re-exported here so callers using
@@ -70,7 +70,7 @@ export {
   type OpenRouterUsage,
   type SharedUsage,
 } from "./providers";
-export { defineTool, type DefineToolOptions } from "./define-tool";
+export { defineTool, type DefineToolOptions } from "./core/define-tool";
 export {
   ambientCwd,
   maxSteps,

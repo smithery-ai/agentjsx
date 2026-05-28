@@ -1,9 +1,9 @@
 import { Chunk, Effect, Layer } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
-import { findSafeCompactionToSeq, lastCompactionEnd } from "../compaction";
-import { eventToFragment } from "../projections";
-import type { Fragment, ToolOutcome } from "../types";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import { findSafeCompactionToSeq, lastCompactionEnd } from "../core/compaction";
+import { eventToFragment } from "../core/projections";
+import type { Fragment, ToolOutcome } from "../core/types";
 import { addToolReporting } from "./tool-registration";
 
 export interface CompactOptions {

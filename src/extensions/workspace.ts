@@ -1,5 +1,5 @@
 import { Layer } from "effect";
-import type { Extension } from "../agent";
+import type { Extension } from "../core/agent";
 import { fileSystem, type FileStore, type FileSystemOptions } from "./file-system";
 import { shell, type Shell, type ShellOptions } from "./shell";
 

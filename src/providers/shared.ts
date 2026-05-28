@@ -18,7 +18,7 @@ import type {
   ProviderContext,
   ProviderMessage,
   ToolDefinition,
-} from "../types";
+} from "../core/types";
 
 export interface SharedUsage {
   input: number;
@@ -137,4 +137,4 @@ export function mapToolCalls(
 
 // Re-export from core so providers can keep using the canonical name
 // `validateProviderContext` without reaching across the package.
-export { validateProviderContext } from "../validate";
+export { validateProviderContext } from "../core/validate";

@@ -1,7 +1,7 @@
 import { Chunk, Effect, Layer, Stream } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
-import { isHalted } from "../projections";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import { isHalted } from "../core/projections";
 
 // Halt after N assistant messages. Watches the event log; when the
 // count of `assistant.message` events reaches `limit` AND the log is

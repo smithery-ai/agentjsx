@@ -1,6 +1,6 @@
 import { Effect, Layer } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
 
 export interface TruncateToolOutputsOptions {
   // Tool-result blocks with content longer than this trigger

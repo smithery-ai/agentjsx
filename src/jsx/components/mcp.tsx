@@ -29,7 +29,7 @@
 // agent dispose within a process lifetime.
 
 import { Effect } from "effect";
-import type { Fragment as RenderedFragment, Tool } from "../../types";
+import type { Fragment as RenderedFragment, Tool } from "../../core/types";
 import { emitFragment, emitTool, type Element, type Node } from "../runtime";
 import { useRenderContext } from "../render";
 

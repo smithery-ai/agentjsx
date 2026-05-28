@@ -7,7 +7,7 @@ import {
   writeFile,
 } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
-import type { FileInfo, FileStore } from "../extensions/file-system";
+import type { FileInfo, FileStore } from "../../extensions/file-system";
 
 // Real-disk FileStore scoped to a single root directory. Path arguments
 // from the model are joined under `root`, so the agent can't escape the

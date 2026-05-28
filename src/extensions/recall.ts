@@ -1,8 +1,8 @@
 import { Chunk, Effect, Layer, Schema } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
-import { EVENT_META } from "../projections";
-import type { Event } from "../types";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
+import { EVENT_META } from "../core/projections";
+import type { Event } from "../core/types";
 import { registerTool } from "./tool-registration";
 
 export interface RecallOptions {

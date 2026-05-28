@@ -1,6 +1,6 @@
 import { Effect, Layer } from "effect";
-import { AgentCtx } from "../agent-ctx";
-import type { Extension } from "../agent";
+import { AgentCtx } from "../core/agent-ctx";
+import type { Extension } from "../core/agent";
 
 // Registers an ambient system block named "cwd" whose content is
 // recomputed every time the block projection materializes. The thunk

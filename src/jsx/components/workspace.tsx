@@ -9,8 +9,8 @@
 
 import { Command, FileSystem, Path } from "@effect/platform";
 import { Effect, Schema, Stream } from "effect";
-import { defineTool } from "../../define-tool";
-import type { Fragment as RenderedFragment } from "../../types";
+import { defineTool } from "../../core/define-tool";
+import type { Fragment as RenderedFragment } from "../../core/types";
 import { emitFragment, emitTool, type Element, type Node } from "../runtime";
 import { useRenderContext } from "../render";
 
