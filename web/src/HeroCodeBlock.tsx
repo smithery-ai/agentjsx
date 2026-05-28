@@ -44,10 +44,9 @@ export function HeroCodeBlock({
 			<div className="ih-code-head">
 				{filename ? (
 					<span className="ih-code-tab ih-code-tab-active">
-						<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-							<path d="M2 4l6-2 6 2v8l-6 2-6-2z" />
-							<path d="M8 6v8" />
-							<path d="M2 4l6 2 6-2" />
+						<svg width="12" height="12" viewBox="0 0 16 16" fill="#3178c6">
+							<rect width="16" height="16" rx="2" />
+							<text x="8" y="12" textAnchor="middle" fontSize="8" fontWeight="700" fontFamily="ui-sans-serif, system-ui, sans-serif" fill="#fff">TS</text>
 						</svg>
 						{filename}
 					</span>

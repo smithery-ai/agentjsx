@@ -5,8 +5,8 @@ import { HeroCodeBlock } from "./HeroCodeBlock"
 export const CODE = `import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
 import {
   Agent, Block, Messages,
-  Workspace, Skills, McpServer, Todo,
-  Compact,
+  Workspace, Skills, McpServer, Memory, WebSearch, WebFetch,
+  Todo, Subagent, Compact,
 } from "@flamecast/agentjsx/components"
 import { NodeContext } from "@flamecast/agentjsx/node"
 
@@ -18,13 +18,15 @@ const agent = createAgentRuntime({
       <Block name="role">You are a coding assistant.</Block>
       <Workspace root="./" />
       <Skills root="./skills" />
+      <Memory root="./.memory" />
+      <WebSearch apiKey={process.env.EXA_API_KEY!} />
+      <WebFetch />
       <McpServer name="deepwiki" url="https://mcp.deepwiki.com/mcp" />
-      <McpServer
-        name="linear"
-        url="https://mcp.linear.app/mcp"
-        headers={{ Authorization: \`Bearer \${process.env.LINEAR_API_KEY}\` }}
-      />
+      <McpServer name="linear" url="https://mcp.linear.app/mcp" headers={{ Authorization: \`Bearer \${process.env.LINEAR_API_KEY}\` }} />
       <Todo />
+      <Subagent>
+        <Workspace root="./" />
+      </Subagent>
       <Compact strategy="summary" threshold={4000}>
         <Messages />
       </Compact>
@@ -45,14 +47,10 @@ const LINE_SLICE: Record<number, Slice> = {
 	13: "role",     // <Block name="role">
 	14: "fs",       // <Workspace root="./" />
 	15: "skill",    // <Skills root="./skills" />
-	16: "mcp",      // <McpServer name="deepwiki" ... />
-	17: "mcp",      // <McpServer name="linear" ...
-	18: "mcp",
-	19: "mcp",
-	20: "mcp",
-	21: "mcp",     // />
-	24: "messages", // <Messages />
-	30: "messages", // await agent.run("...")
+	19: "mcp",      // <McpServer name="deepwiki" ... />
+	20: "mcp",      // <McpServer name="linear" ... />
+	26: "messages", // <Messages />
+	32: "messages", // await agent.run("...")
 }
 
 const HIGHLIGHTED = new Set(Object.keys(LINE_SLICE).map(Number))
@@ -145,10 +143,9 @@ export function InteractiveContextHero() {
 			<div className="split-head">
 				<div>
 					<span className="split-tab">
-						<svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-							<path d="M2 4l6-2 6 2v8l-6 2-6-2z" />
-							<path d="M8 6v8" />
-							<path d="M2 4l6 2 6-2" />
+						<svg width="12" height="12" viewBox="0 0 16 16" fill="#3178c6">
+							<rect width="16" height="16" rx="2" />
+							<text x="8" y="12" textAnchor="middle" fontSize="8" fontWeight="700" fontFamily="ui-sans-serif, system-ui, sans-serif" fill="#fff">TS</text>
 						</svg>
 						agent.tsx
 					</span>

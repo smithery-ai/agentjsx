@@ -401,6 +401,52 @@ a:focus-visible {
 }
 
 .landing-section + .landing-section { margin-top: 80px; }
+
+.landing-build-section {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+	gap: 48px;
+	align-items: start;
+	max-width: 1100px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.landing-build-text {
+	padding-top: 8px;
+}
+.landing-build-heading {
+	margin: 0 0 16px;
+	font-size: 28px;
+	line-height: 1.15;
+	letter-spacing: -0.02em;
+	font-weight: 500;
+	color: var(--fg-1);
+}
+.landing-build-lede {
+	margin: 0;
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--fg-70);
+}
+.landing-build-lede code {
+	font-family: inherit;
+	font-size: 0.95em;
+	padding: 1px 5px;
+	border-radius: 4px;
+	background: var(--surface-tint);
+	color: var(--fg-1);
+}
+.landing-build-section .landing-code-section {
+	max-width: none;
+	margin-left: 0;
+	margin-right: 0;
+}
+@media (max-width: 720px) {
+	.landing-build-section {
+		grid-template-columns: 1fr;
+		gap: 24px;
+	}
+}
 /* `.caption` inside a landing section is a section heading (h2). The
  * explicit margin-reset is needed because the global `.caption`
  * is for in-app micro-captions; landing wants a real section heading
@@ -731,7 +777,7 @@ button.ih-code-tab:hover { color: var(--fg-70); }
    text. Bigger font + line-height + vertical padding so the block sits
    taller than the default ih-code-body used in InteractiveHero. */
 .landing-code-section {
-	max-width: 600px;
+	max-width: 820px;
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -740,7 +786,7 @@ button.ih-code-tab:hover { color: var(--fg-70); }
 	font-size: 12.5px;
 	line-height: 1.95;
 	min-height: 540px;
-	overflow-x: hidden;
+	overflow-x: auto;
 }
 .landing-code-section .ih-code-line {
 	min-height: 2em;
@@ -751,8 +797,7 @@ button.ih-code-tab:hover { color: var(--fg-70); }
    is handled by .ih-line-text via padding-left + text-indent so wrapped
    lines align under the code, not the line-number gutter. */
 .landing-code-section .ih-line-text {
-	white-space: pre-wrap;
-	word-break: break-word;
+	white-space: pre;
 	flex: 1;
 	min-width: 0;
 }
