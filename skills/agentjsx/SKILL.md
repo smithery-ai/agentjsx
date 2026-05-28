@@ -205,10 +205,8 @@ src/
 ├── providers/                  InferFn implementations (AI Gateway, OpenRouter)
 └── platforms/
     ├── node/                   real fs/shell via @effect/platform-node
-    ├── bun/                    BunContext re-export
-    ├── browser/                placeholder (no unified BrowserContext upstream)
-    ├── worker/                 placeholder (no stable workerd platform pkg)
-    └── cloudflare/             placeholder (R2/D1/Workers AI helpers)
+    ├── bun/                    BunContext re-export (full surface)
+    └── browser/                partial: HTTP only, no FileSystem/CommandExecutor
 ```
 
 Most authoring tasks touch only `src/jsx/components/` + maybe `src/core/types.ts` + `src/core/projections.ts` for new event types.
@@ -218,3 +216,4 @@ Most authoring tasks touch only `src/jsx/components/` + maybe `src/core/types.ts
 - `references/components.md` — full templates for content, capability, and shaper components, including the async-cache and event-log patterns
 - `references/architecture.md` — render walk internals, the reconciler, RenderContext injection, `renderChildren` semantics
 - `references/extensions.md` — the legacy Effect Layer API: when to use it, the canonical shape, migration to JSX components
+- `references/platforms.md` — per-runtime adapter status (Node, Bun work; Browser partial; Worker/Cloudflare not implemented), how to wire `platform`, common gotchas
