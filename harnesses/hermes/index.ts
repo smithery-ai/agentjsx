@@ -32,14 +32,14 @@ import {
   createAgentRuntime,
   createAiGatewayInfer,
   type Extension,
-} from "effectctx";
+} from "@flamecast/agentjsx";
 import {
   inProcessBackend,
   maxSteps,
   recall,
   subagents,
-} from "effectctx/extensions";
-import { localWorkspace } from "effectctx/node";
+} from "@flamecast/agentjsx/extensions";
+import { localWorkspace } from "@flamecast/agentjsx/node";
 
 import { clarify, type ClarifyHost } from "./extensions/clarify";
 import { dynamicSkills } from "./extensions/dynamic-skills";

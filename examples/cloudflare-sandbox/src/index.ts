@@ -8,14 +8,14 @@
 //   https://blog.cloudflare.com/sandbox-ga/
 
 import { getSandbox, type Sandbox } from "@cloudflare/sandbox";
-import { createAgentRuntime, createAiGatewayInfer } from "effectctx";
+import { createAgentRuntime, createAiGatewayInfer } from "@flamecast/agentjsx";
 import {
   maxSteps,
   workspace,
   type FileInfo,
   type FileStore,
   type Shell,
-} from "effectctx/extensions";
+} from "@flamecast/agentjsx/extensions";
 
 export { Sandbox } from "@cloudflare/sandbox";
 

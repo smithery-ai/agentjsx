@@ -1,5 +1,5 @@
 import { Effect, Layer, Schema } from "effect";
-import { AgentCtx, defineTool, type Extension } from "effectctx";
+import { AgentCtx, defineTool, type Extension } from "@flamecast/agentjsx";
 
 // Mirrors Hermes's `clarify_tool.py`. The model can interrupt its own
 // reasoning to ask the user a question — open-ended or with up to 4

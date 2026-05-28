@@ -1,5 +1,5 @@
 import { Chunk, Effect, Layer } from "effect";
-import { AgentCtx, type Event, type Extension } from "effectctx";
+import { AgentCtx, type Event, type Extension } from "@flamecast/agentjsx";
 
 // Hermes "nudges itself to persist knowledge". Concretely: after a
 // stretch of activity without a memory write, the model sees a

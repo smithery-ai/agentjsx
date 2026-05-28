@@ -1,5 +1,5 @@
 import { Effect, Layer, Schema } from "effect";
-import { AgentCtx, defineTool, type Extension } from "effectctx";
+import { AgentCtx, defineTool, type Extension } from "@flamecast/agentjsx";
 import type { UserModelStore } from "../user-model-store";
 
 // Hermes uses Honcho for dialectic user modeling — a separate service

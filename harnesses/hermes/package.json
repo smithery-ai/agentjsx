@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "effect": "^3.21.1",
-    "effectctx": "file:../.."
+    "@flamecast/agentjsx": "file:../.."
   },
   "devDependencies": {
     "@types/node": "^22.19.17",

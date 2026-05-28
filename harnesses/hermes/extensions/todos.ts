@@ -1,5 +1,5 @@
 import { Chunk, Effect, Layer, Schema } from "effect";
-import { AgentCtx, defineTool, type Event, type Extension } from "effectctx";
+import { AgentCtx, defineTool, type Event, type Extension } from "@flamecast/agentjsx";
 
 // Mirrors Hermes's `todo_tool.py`. Single tool: `todo`. Calls with no
 // args read; calls with `todos: [...]` write the full list.

@@ -1,5 +1,5 @@
 import { Effect, Layer, Schema } from "effect";
-import { AgentCtx, defineTool, type Extension } from "effectctx";
+import { AgentCtx, defineTool, type Extension } from "@flamecast/agentjsx";
 import type { SkillStore } from "../skill-store";
 
 // Mirrors the agent-facing surface of Hermes's curator + skill_usage

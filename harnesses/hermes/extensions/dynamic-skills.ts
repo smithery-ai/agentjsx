@@ -1,5 +1,5 @@
 import { Effect, Layer, Schema } from "effect";
-import { AgentCtx, defineTool, type Extension } from "effectctx";
+import { AgentCtx, defineTool, type Extension } from "@flamecast/agentjsx";
 import type { SkillStore } from "../skill-store";
 
 // Read-side counterpart to `learning-loop`. Where the core `skills`

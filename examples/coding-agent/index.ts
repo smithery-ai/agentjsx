@@ -19,9 +19,9 @@
 import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 
-import { createAgentRuntime, createAiGatewayInfer } from "effectctx";
-import { maxSteps } from "effectctx/extensions";
-import { localWorkspace } from "effectctx/node";
+import { createAgentRuntime, createAiGatewayInfer } from "@flamecast/agentjsx";
+import { maxSteps } from "@flamecast/agentjsx/extensions";
+import { localWorkspace } from "@flamecast/agentjsx/node";
 
 async function main() {
   const apiKey = process.env.AI_GATEWAY_API_KEY;

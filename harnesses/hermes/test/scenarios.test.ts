@@ -30,8 +30,8 @@ import {
   type Event,
   type InferFn,
   type ProviderContext,
-} from "effectctx";
-import { inProcessBackend, recall, subagents } from "effectctx/extensions";
+} from "@flamecast/agentjsx";
+import { inProcessBackend, recall, subagents } from "@flamecast/agentjsx/extensions";
 
 import { clarify } from "../extensions/clarify";
 import { dynamicSkills } from "../extensions/dynamic-skills";
