@@ -1,18 +1,43 @@
 # REPL example
 
-Interactive prompt to reply loop against an agentjsx agent. The simplest end-to-end demo: type a message, watch tool calls and assistant replies stream into your terminal, with real filesystem and shell access via `@effect/platform-node`.
+Interactive prompt to reply loop against an agentjsx agent, plus a one-shot non-interactive mode for scripting and e2e verification. Real filesystem and shell access via `@effect/platform-node`.
 
 ```bash
 cd examples/repl
 pnpm install
+
+# Interactive REPL
 AI_GATEWAY_API_KEY=sk-... pnpm start
+
+# One-shot — pass the prompt as an argument
+AI_GATEWAY_API_KEY=sk-... pnpm start "list every TODO in src/"
+
+# One-shot — pipe prompt via stdin
+echo "what's in the workspace?" | AI_GATEWAY_API_KEY=sk-... pnpm start --stdin
+
+# One-shot with a remote MCP server attached
+MCP_URL=https://mcp.example.com/server \
+MCP_NAME=example \
+AI_GATEWAY_API_KEY=sk-... \
+  pnpm start "list the open issues from example"
 ```
 
-Or under Infisical (Smithery contributors with workspace access):
+## Environment variables
+
+- `AI_GATEWAY_API_KEY` (required): Vercel AI Gateway key used by the inference adapter.
+- `MCP_URL` (optional): URL of an HTTP MCP server. When set, the JSX tree includes `<McpServer>` and the agent gets access to that server's tools, namespaced as `<MCP_NAME>_<toolname>`. When unset, the component is omitted from the tree entirely and the agent runs with only the local loadout.
+- `MCP_NAME` (optional, default `remote`): short identifier used in tool namespacing and the rendered system block.
+
+UX caveat: on the first turn the rendered MCP block and tool listing show as `(connecting...)` because the connection is fire-and-forget. By turn two the connection has resolved and the tools and the listing show up populated. This is the same shape as the Skills cache.
+
+Under Infisical (Smithery contributors with workspace access):
 
 ```bash
-infisical run --silent -- pnpm start
+infisical run --silent -- pnpm start                          # interactive
+infisical run --silent -- pnpm start "fix the typo in README" # one-shot
 ```
+
+In one-shot mode the program sends the prompt, waits for the terminal assistant turn, prints the reply (with tool-call commentary), and exits cleanly. Same agent, same JSX context, just no readline loop.
 
 You'll see something like:
 
@@ -42,6 +67,7 @@ The JSX `context` tree wires up the full demo loadout:
 - `<Block name="role">` — the persona.
 - `<Workspace root="./" />` — filesystem and shell tools backed by `@effect/platform-node`.
 - `<Skills root={SKILLS_ROOT} />` — exposes the markdown files in `./skills/` to the agent. Emits a `<skills>` ambient block listing each skill with its one-line description, plus `skill_lookup` and `skill_invoke` tools the model can call to pull a skill body into context. First render shows `(loading...)`; subsequent renders (triggered by any agent event) show the populated listing.
+- `<McpServer name={MCP_NAME} url={MCP_URL} />` (conditional on `MCP_URL`) — connects to an HTTP MCP server lazily on first render and exposes its tools to the agent namespaced as `<MCP_NAME>_<toolname>`. First render shows `(connecting to ...)`; subsequent renders show the ready or failed state. Omitted from the tree entirely when `MCP_URL` is unset.
 - `<Todo />` — multi-step task tracking. State is event-log-based, so todos durably replay from the event stream. If you later layer session persistence on top, todos hydrate for free.
 - `<Compact strategy="truncate-tool-outputs" limit={800}>` wrapping `<Messages />` — caps any single tool-result fragment at 800 characters with a preview and a recovery hint. Stops a single `cat` of a giant file or a noisy `npm install` from blowing out the context window. The wrap is local: only fragments emitted inside it (the history projection) get shaped; ambient blocks above stay untouched.
 
