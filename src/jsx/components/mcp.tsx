@@ -76,6 +76,7 @@ const isTextBlock = (v: unknown): v is { type: "text"; text: string } =>
 // preserved.
 function connectAndList(
   url: string,
+  headers: McpHeaders | undefined,
 ): Effect.Effect<
   | { ok: true; client: McpClient; tools: ToolMeta[] }
   | { ok: false; error: string },
@@ -103,7 +104,15 @@ function connectAndList(
         connect(t: unknown): Promise<void>;
         listTools(): Promise<{ tools: unknown[] }>;
       };
-      await client.connect(new StreamableHTTPClientTransport(new URL(url)));
+      // Resolve thunk form (sync or async) so callers can rotate
+      // tokens without remounting. Static objects pass through.
+      const resolvedHeaders =
+        typeof headers === "function" ? await headers() : headers;
+      await client.connect(
+        new StreamableHTTPClientTransport(new URL(url), {
+          requestInit: resolvedHeaders ? { headers: resolvedHeaders } : undefined,
+        }),
+      );
       const listing = await client.listTools();
       const tools: ToolMeta[] = [];
       for (const raw of listing.tools) {
@@ -128,9 +137,26 @@ function connectAndList(
   );
 }
 
+// Headers sent on every HTTP request to the MCP server. A plain
+// `Record<string, string>` covers `Authorization: Bearer ...` and
+// API-key cases; a sync/async thunk supports token rotation at
+// connect time. The thunk runs once when the cache misses — the
+// cached client reuses its initial headers across renders, so per-
+// request rotation is a follow-up (requires a `fetch` override on
+// the transport). We deliberately type this as `Record<string,
+// string>` rather than the DOM `HeadersInit` global to keep this
+// file lib-agnostic (the project's tsconfig doesn't include DOM).
+export type McpHeadersValue = Record<string, string>;
+export type McpHeaders =
+  | McpHeadersValue
+  | (() => McpHeadersValue | Promise<McpHeadersValue>);
+
 export interface McpServerProps {
   readonly name: string;
   readonly url: string;
+  // HTTP headers for `Authorization: Bearer ...` / API-key auth.
+  // Forwarded into the SDK transport's `requestInit.headers`.
+  readonly headers?: McpHeaders;
   // stdio (command-based) servers are deliberately omitted in this
   // MVP. The full extension at `src/extensions/mcp-servers.ts`
   // supports them; a follow-up can extend this component to accept a
@@ -138,8 +164,13 @@ export interface McpServerProps {
 }
 
 export function McpServer(props: McpServerProps): Node {
-  const { name, url } = props;
+  const { name, url, headers } = props;
   const { runEffect } = useRenderContext();
+  // Cache key intentionally excludes `headers`: two `<McpServer>`s
+  // with the same name+url but different headers will share the first-
+  // connected client (one wins). In practice operators don't mount two
+  // servers at the same URL with divergent auth. Follow-up: hash
+  // resolved headers into the key if that assumption breaks.
   const key = `${name}::${url}`;
 
   let state = cache.get(key);
@@ -149,7 +180,7 @@ export function McpServer(props: McpServerProps): Node {
     // Fire-and-forget. The render walk doesn't await this; the next
     // natural render after this resolves will see the updated state.
     void runEffect(
-      connectAndList(url) as unknown as Effect.Effect<
+      connectAndList(url, headers) as unknown as Effect.Effect<
         | { ok: true; client: McpClient; tools: ToolMeta[] }
         | { ok: false; error: string },
         never,

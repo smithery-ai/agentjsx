@@ -6,7 +6,7 @@
 // test hermetic — no real `@modelcontextprotocol/sdk` round-trip.
 
 import { Chunk, Effect, SubscriptionRef } from "effect";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { AgentCtx, createAgentRuntime, render } from "@flamecast/agentjsx";
 import {
   createElement,
@@ -157,6 +157,117 @@ describe("jsx McpServer e2e", () => {
       expect(seenContexts.length).toBe(2);
     } finally {
       await agent.dispose();
+    }
+  });
+
+  it("forwards headers into StreamableHTTPClientTransport via requestInit.headers (static + thunk)", async () => {
+    // Exercises the real connect path (not the cache-seed escape
+    // hatch) by stubbing the SDK's streamableHttp + client modules at
+    // dynamic-import resolution time. `vi.doMock` is scoped to this
+    // block so the prior seed-based test sees the unmocked SDK.
+    const transportCalls: Array<{ url: URL; opts: unknown }> = [];
+    vi.doMock(
+      "@modelcontextprotocol/sdk/client/streamableHttp.js",
+      () => ({
+        StreamableHTTPClientTransport: class {
+          constructor(url: URL, opts: unknown) {
+            transportCalls.push({ url, opts });
+          }
+        },
+      }),
+    );
+    vi.doMock("@modelcontextprotocol/sdk/client/index.js", () => ({
+      Client: class {
+        async connect(): Promise<void> {}
+        async listTools(): Promise<{ tools: unknown[] }> {
+          return {
+            tools: [
+              {
+                name: "ping",
+                description: "ping",
+                inputSchema: { type: "object", properties: {} },
+              },
+            ],
+          };
+        }
+        async close(): Promise<void> {}
+      },
+    }));
+
+    try {
+      // Static-object form.
+      {
+        const infer: InferFn = async () => ({ content: "ok", tool_calls: [] });
+        const agent = createAgentRuntime({
+          infer,
+          context: () =>
+            render(
+              <Agent>
+                <McpServer
+                  name="static"
+                  url="https://example.com/static"
+                  headers={{ Authorization: "Bearer static-token" }}
+                />
+                <Messages />
+              </Agent>,
+            ),
+        });
+        try {
+          await agent.send("go");
+          // The connect is fire-and-forget; wait for the transport
+          // constructor to actually run.
+          for (let i = 0; i < 50 && transportCalls.length < 1; i++) {
+            await new Promise((r) => setTimeout(r, 20));
+          }
+        } finally {
+          await agent.dispose();
+        }
+      }
+
+      expect(transportCalls.length).toBeGreaterThanOrEqual(1);
+      const staticCall = transportCalls[0]!;
+      expect(staticCall.url.toString()).toBe("https://example.com/static");
+      expect(staticCall.opts).toEqual({
+        requestInit: { headers: { Authorization: "Bearer static-token" } },
+      });
+
+      // Thunk form (async).
+      {
+        const infer: InferFn = async () => ({ content: "ok", tool_calls: [] });
+        const agent = createAgentRuntime({
+          infer,
+          context: () =>
+            render(
+              <Agent>
+                <McpServer
+                  name="thunk"
+                  url="https://example.com/thunk"
+                  headers={async () => ({ "X-Api-Key": "rotated" })}
+                />
+                <Messages />
+              </Agent>,
+            ),
+        });
+        try {
+          await agent.send("go");
+          for (let i = 0; i < 50 && transportCalls.length < 2; i++) {
+            await new Promise((r) => setTimeout(r, 20));
+          }
+        } finally {
+          await agent.dispose();
+        }
+      }
+
+      const thunkCall = transportCalls.find(
+        (c) => c.url.toString() === "https://example.com/thunk",
+      );
+      expect(thunkCall).toBeDefined();
+      expect(thunkCall!.opts).toEqual({
+        requestInit: { headers: { "X-Api-Key": "rotated" } },
+      });
+    } finally {
+      vi.doUnmock("@modelcontextprotocol/sdk/client/streamableHttp.js");
+      vi.doUnmock("@modelcontextprotocol/sdk/client/index.js");
     }
   });
 });
