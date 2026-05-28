@@ -23,6 +23,7 @@ import {
 	Agent,
 	Block,
 	Compact,
+	McpServer,
 	Messages,
 	Skills,
 	Todo,
@@ -36,6 +37,8 @@ import { fileURLToPath } from "node:url"
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const SKILLS_ROOT = path.resolve(__dirname, "./skills")
+const MCP_URL = process.env.MCP_URL
+const MCP_NAME = process.env.MCP_NAME ?? "remote"
 
 const DIM = (s: string) => `\x1b[2m${s}\x1b[0m`
 const BLUE = (s: string) => `\x1b[34m${s}\x1b[0m`
@@ -108,6 +111,7 @@ const program = Effect.gen(function* () {
 					</Block>
 					<Workspace root="./" />
 					<Skills root={SKILLS_ROOT} />
+					{MCP_URL ? <McpServer name={MCP_NAME} url={MCP_URL} /> : null}
 					<Todo />
 					<Compact strategy="truncate-tool-outputs" limit={800}>
 						<Messages />
