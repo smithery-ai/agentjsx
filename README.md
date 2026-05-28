@@ -1,6 +1,6 @@
 # agentjsx (experimental)
 
-Compose agents using JSX.
+A runtime agnostic framework for composing modern agent harnesses using JSX.
 
 ## Install
 
