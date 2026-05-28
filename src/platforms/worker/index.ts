@@ -1,13 +1,23 @@
-// Cloudflare Workers (workerd) runtime adapter.
+// Cloudflare Workers (workerd) runtime adapter — STUB.
 //
-// Placeholder: no stable @effect/platform package for workerd exists
-// as of this writing. When Effect ships one (or we build our own),
-// this module will export the corresponding Context + platform layer.
+// Status: no upstream `@effect/platform-workerd` exists on npm. The
+// agentjsx integration is blocked on either:
 //
-// For Cloudflare Workers today, consumers can:
-//   - Use the Sandbox-backed adapters via examples/cloudflare-sandbox
-//     (older pattern, pre-JSX components)
-//   - Stub the platform layer with FileSystem.layerNoop + skip shell
-//     operations (workspace tools will fail with clear errors)
+//   - Effect shipping a workerd platform package (community work in
+//     progress; check the Effect-TS GitHub org for status)
+//   - This package providing its own minimal workerd layer (no-op
+//     CommandExecutor, KV / R2-backed FileSystem, fetch-based
+//     HttpClient). Open an issue if you want to design this.
+//
+// In the meantime, agentjsx CAN run in Cloudflare Workers without a
+// platform layer — most components don't need one. The constraints:
+//
+//   - Omit `<Workspace>` (no fs / no shell in workerd)
+//   - Provide a custom `InferFn` that uses the Workers fetch API
+//   - `<McpServer>` works fine (HTTP-based)
+//   - `<Block>`, `<Messages>`, `<Compact>`, `<Todo>` all work
+//   - Leave `platform` undefined in `createAgentRuntime({ ... })` —
+//     <Workspace> would have degraded to error-string tool returns
+//     anyway; everything else is platform-agnostic
 
 export {}
