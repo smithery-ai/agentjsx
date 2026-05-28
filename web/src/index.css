@@ -400,7 +400,7 @@ a:focus-visible {
 	}
 }
 
-.landing-section + .landing-section { margin-top: 80px; }
+.landing-section + .landing-section { margin-top: 140px; }
 
 .landing-build-section {
 	display: grid;

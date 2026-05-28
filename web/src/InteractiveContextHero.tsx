@@ -6,7 +6,7 @@ export const CODE = `import { createAgentRuntime, createAiGatewayInfer, render }
 import {
   Agent, Block, Messages,
   Workspace, Skills, McpServer, Memory, WebSearch, WebFetch,
-  Todo, Subagent, Compact,
+  Todo, Subagent, Goal, Compact,
 } from "@flamecast/agentjsx/components"
 import { NodeContext } from "@flamecast/agentjsx/node"
 
@@ -16,6 +16,7 @@ const agent = createAgentRuntime({
   context: () => render(
     <Agent>
       <Block name="role">You are a coding assistant.</Block>
+      <Goal />
       <Workspace root="./" />
       <Skills root="./skills" />
       <Memory root="./.memory" />
@@ -34,7 +35,7 @@ const agent = createAgentRuntime({
   ),
 })
 
-await agent.run("Find the latest bug in Linear and open a PR fixing it.")`
+await agent.run("/goal A PR is opened that fixes the Linear bug, and CI is green.")`
 
 // Each JSX line maps to one slice in the rendered context panel.
 // "fs", "skill", and "mcp" are capability components: clicking them
@@ -45,12 +46,12 @@ type Slice = "role" | "fs" | "skill" | "mcp" | "messages"
 
 const LINE_SLICE: Record<number, Slice> = {
 	13: "role",     // <Block name="role">
-	14: "fs",       // <Workspace root="./" />
-	15: "skill",    // <Skills root="./skills" />
-	19: "mcp",      // <McpServer name="deepwiki" ... />
-	20: "mcp",      // <McpServer name="linear" ... />
-	26: "messages", // <Messages />
-	32: "messages", // await agent.run("...")
+	15: "fs",       // <Workspace root="./" />
+	16: "skill",    // <Skills root="./skills" />
+	20: "mcp",      // <McpServer name="deepwiki" ... />
+	21: "mcp",      // <McpServer name="linear" ... />
+	27: "messages", // <Messages />
+	33: "messages", // await agent.run("/goal ...")
 }
 
 const HIGHLIGHTED = new Set(Object.keys(LINE_SLICE).map(Number))

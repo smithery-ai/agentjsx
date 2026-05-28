@@ -9,16 +9,13 @@ const COPY_PROMPT = `I want to build a coding agent using @flamecast/agentjsx. R
 
 ${agentjsxSkill}`
 
-const COMPONENT_CODE = `import { render } from "@flamecast/agentjsx"
-import {
-  Agent, Messages, emitFragment, emitHaltPredicate,
+const COMPONENT_CODE = `import {
+  emitFragment, emitHaltPredicate,
 } from "@flamecast/agentjsx/components"
 
-// Claude-Code-style /goal. The agent can't call a "done" tool — it
-// doesn't have one. Halting is gated by an independent inference call
-// that judges the transcript against the condition. The model sees
-// the goal in its system block, but completion is decided externally.
-function Goal({ condition }: { condition: string }) {
+// Halting is gated by a separate inference call that judges the
+// transcript against the condition. Invoked as \`/goal <condition>\`.
+export function Goal({ condition }: { condition: string }) {
   return [
     emitFragment({
       tag: "core/system",
@@ -39,21 +36,13 @@ function Goal({ condition }: { condition: string }) {
       return JSON.parse(res.content)
     }),
   ]
-}
-
-// Drop it in like any built-in component:
-render(
-  <Agent>
-    <Goal condition="every TODO has a Linear ticket" />
-    <Messages />
-  </Agent>
-)`
+}`
 
 function LandingHeader() {
 	return (
 		<header className="landing-head">
 			<a className="brand" href="/">
-				agentctx
+				agentjsx
 			</a>
 		</header>
 	)
@@ -75,13 +64,6 @@ function CopyPromptCta() {
 	)
 }
 
-const LINKS = [
-	{
-		href: "https://github.com/smithery-ai/agentjsx",
-		label: "GitHub",
-		desc: "Source, issues, and the full extension catalog.",
-	},
-]
 
 export function Landing() {
 	return (
@@ -138,29 +120,6 @@ export function Landing() {
 							filename="goal.tsx"
 						/>
 					</div>
-				</section>
-
-				<section
-					className="landing-section"
-					aria-labelledby="section-where"
-				>
-					<h2 id="section-where" className="caption">
-						Where to go
-					</h2>
-					<ul className="landing-links">
-						{LINKS.map(l => (
-							<li key={l.href}>
-								<a href={l.href}>
-									<span className="landing-link-label">
-										{l.label}
-									</span>
-									<span className="landing-link-desc">
-										{l.desc}
-									</span>
-								</a>
-							</li>
-						))}
-					</ul>
 				</section>
 			</main>
 		</div>

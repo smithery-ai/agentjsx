@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <clipPath id="card-clip">
+      <rect x="580" y="130" width="540" height="540" rx="6" ry="6"/>
+    </clipPath>
+  </defs>
+
+  <rect width="1200" height="630" fill="#1a1816"/>
+
+  <!-- Main headline: brand -->
+  <text x="60" y="280" font-family="-apple-system, ui-sans-serif, system-ui, Helvetica, Arial, sans-serif" font-size="124" font-weight="500" fill="#e8e6e3" letter-spacing="-0.03em">agent<tspan fill="#ff5601">.</tspan>jsx</text>
+
+  <!-- Sub-headline: tagline. ~64px below headline baseline so it groups
+       tightly with the brand, leaving the lower half for the footer URL. -->
+  <text x="60" y="360" font-family="-apple-system, ui-sans-serif, system-ui, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#a8a6a3" letter-spacing="-0.01em">Write your own Claude Code.</text>
+  <text x="60" y="402" font-family="-apple-system, ui-sans-serif, system-ui, Helvetica, Arial, sans-serif" font-size="32" font-weight="400" fill="#a8a6a3" letter-spacing="-0.01em">Run it anywhere.</text>
+
+  <!-- Footer URL pinned 60px from the bottom edge. -->
+  <text x="60" y="570" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="20" fill="#6e6c6a">github.com/smithery-ai/agentjsx</text>
+
+  <!-- Code card. Lifted up so the bottom of the JSX tree (Compact +
+       Messages + </Agent>) is visible inside the canvas; only the
+       closing }) bleed past the bottom edge. -->
+  <rect x="580" y="130" width="540" height="540" rx="6" ry="6"
+        fill="#26221f" stroke="rgba(232,230,227,0.10)" stroke-width="1"/>
+
+  <g clip-path="url(#card-clip)">
+    <!-- Header strip -->
+    <line x1="580" y1="170" x2="1120" y2="170" stroke="rgba(232,230,227,0.10)" stroke-width="1"/>
+    <rect x="600" y="146" width="14" height="14" rx="2" ry="2" fill="#3178c6"/>
+    <text x="607" y="157" text-anchor="middle" font-family="-apple-system, ui-sans-serif, system-ui, sans-serif" font-size="8" font-weight="700" fill="#ffffff">TS</text>
+    <text x="622" y="158" font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="12" fill="#e8e6e3">agent.tsx</text>
+
+    <!-- Code body. Line numbers in a 36px gutter, code starts at x=648.
+         Line height 26px, font 15px mono. Syntax colors match the live
+         HeroCodeBlock (#93c5fd tag, #86efac string, #c084fc keyword,
+         #6e6c6a punctuation). -->
+    <g font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace" font-size="15">
+      <g fill="rgba(232,230,227,0.20)" text-anchor="end" font-size="11">
+        <text x="634" y="206">1</text>
+        <text x="634" y="232">2</text>
+        <text x="634" y="258">3</text>
+        <text x="634" y="284">4</text>
+        <text x="634" y="310">5</text>
+        <text x="634" y="336">6</text>
+        <text x="634" y="362">7</text>
+        <text x="634" y="388">8</text>
+        <text x="634" y="414">9</text>
+        <text x="634" y="440">10</text>
+        <text x="634" y="466">11</text>
+        <text x="634" y="492">12</text>
+        <text x="634" y="518">13</text>
+        <text x="634" y="544">14</text>
+        <text x="634" y="570">15</text>
+        <text x="634" y="596">16</text>
+        <text x="634" y="622">17</text>
+      </g>
+      <text x="648" y="206" xml:space="preserve" fill="#c084fc">import <tspan fill="#e8e6e3">{ createAgentRuntime, render }</tspan> <tspan fill="#c084fc">from</tspan> <tspan fill="#86efac">"…"</tspan></text>
+      <text x="648" y="232" xml:space="preserve" fill="#c084fc">import <tspan fill="#e8e6e3">{</tspan></text>
+      <text x="648" y="258" xml:space="preserve" fill="#e8e6e3">  Agent, Workspace, Skills, McpServer,</text>
+      <text x="648" y="284" xml:space="preserve" fill="#e8e6e3">  Goal, Messages, Compact,</text>
+      <text x="648" y="310" xml:space="preserve" fill="#e8e6e3">} <tspan fill="#c084fc">from</tspan> <tspan fill="#86efac">"@flamecast/agentjsx/components"</tspan></text>
+      <text x="648" y="336" xml:space="preserve" fill="#6e6c6a"> </text>
+      <text x="648" y="362" xml:space="preserve" fill="#c084fc">const <tspan fill="#e8e6e3">agent =</tspan> <tspan fill="#93c5fd">createAgentRuntime</tspan>(<tspan fill="#e8e6e3">{</tspan></text>
+      <text x="648" y="388" xml:space="preserve" fill="#e8e6e3">  context: () =&gt; <tspan fill="#93c5fd">render</tspan>(</text>
+      <text x="648" y="414" xml:space="preserve" fill="#6e6c6a">    &lt;<tspan fill="#93c5fd">Agent</tspan>&gt;</text>
+      <text x="648" y="440" xml:space="preserve" fill="#6e6c6a">      &lt;<tspan fill="#93c5fd">Workspace</tspan> <tspan fill="#86efac">root</tspan>=<tspan fill="#86efac">"./"</tspan> /&gt;</text>
+      <text x="648" y="466" xml:space="preserve" fill="#6e6c6a">      &lt;<tspan fill="#93c5fd">Skills</tspan> <tspan fill="#86efac">root</tspan>=<tspan fill="#86efac">"./skills"</tspan> /&gt;</text>
+      <text x="648" y="492" xml:space="preserve" fill="#6e6c6a">      &lt;<tspan fill="#93c5fd">McpServer</tspan> <tspan fill="#86efac">name</tspan>=<tspan fill="#86efac">"linear"</tspan> ... /&gt;</text>
+      <text x="648" y="518" xml:space="preserve" fill="#6e6c6a">      &lt;<tspan fill="#93c5fd">Goal</tspan> /&gt;</text>
+      <text x="648" y="544" xml:space="preserve" fill="#6e6c6a">      &lt;<tspan fill="#93c5fd">Compact</tspan> <tspan fill="#86efac">strategy</tspan>=<tspan fill="#86efac">"summary"</tspan>&gt;</text>
+      <text x="648" y="570" xml:space="preserve" fill="#6e6c6a">        &lt;<tspan fill="#93c5fd">Messages</tspan> /&gt;</text>
+      <text x="648" y="596" xml:space="preserve" fill="#6e6c6a">      &lt;/<tspan fill="#93c5fd">Compact</tspan>&gt;</text>
+      <text x="648" y="622" xml:space="preserve" fill="#6e6c6a">    &lt;/<tspan fill="#93c5fd">Agent</tspan>&gt;</text>
+    </g>
+  </g>
+</svg>
