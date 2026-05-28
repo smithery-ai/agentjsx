@@ -7,7 +7,9 @@ import {
   Stream,
   SubscriptionRef,
 } from "effect";
+import type { CommandRuntime, HaltPredicate } from "../jsx/runtime";
 import { AgentCtx, type AgentErrorEntry, type Renderer } from "./agent-ctx";
+import { runHaltGate } from "./halt-gate";
 import { runInference } from "./inference";
 import { validateProviderContext } from "./validate";
 import { PendingSends } from "./pending-sends";
@@ -158,6 +160,10 @@ export const createAgent = (
           : opts.validate ?? validateProviderContext,
     });
     yield* runToolExecution({ concurrency: opts.toolConcurrency ?? 8 });
+    // Halt-gate supervisor: runs predicates on each `assistant.halted` and
+    // appends a synthetic user.message that re-prompts the model when a
+    // goal is unmet. No-op when no predicates are registered.
+    yield* runHaltGate(opts.infer);
 
     return ctx;
   });
@@ -270,15 +276,70 @@ export const createAgentRuntime = (opts: AgentOptions): Agent => {
     withCtx((ctx) => ctx.events.snapshot.pipe(Effect.map(lastResult)));
 
   const run = (input: unknown): Promise<void> => {
-    const body: Effect.Effect<void, never, AgentCtx | PendingSends> = Effect.gen(function* () {
+    const SLASH_RE = /^\/([a-zA-Z_][\w-]*)(?:\s+([\s\S]*))?$/;
+    const body: Effect.Effect<
+      Promise<void> | null,
+      never,
+      AgentCtx | PendingSends
+    > = Effect.gen(function* () {
       const ctx = yield* AgentCtx;
       const pending = yield* PendingSends;
+
+      // Slash-command router. Only intercepts when input is a string
+      // matching `/<ident>(...)`. Looks up the name in the current JSX
+      // projection's command list; if matched, runs the handler instead
+      // of appending a user.message / triggering inference. Unknown
+      // commands fall through with a warning so the model still gets
+      // the literal text (lets the model explain that the slash command
+      // isn't registered rather than silently dropping the input).
+      if (typeof input === "string") {
+        const m = input.match(SLASH_RE);
+        if (m) {
+          const name = m[1]!;
+          const args = m[2] ?? "";
+          const cmds = yield* SubscriptionRef.get(ctx.commands);
+          const cmd = cmds.find((c) => c.name === name);
+          if (cmd) {
+            // Build the handler-facing CommandRuntime. Each method
+            // bridges out of the handler's JS-promise world back into
+            // Effect via runtime.runPromise. `appendUserMessage` goes
+            // through ctx.events.append so the log remains the single
+            // source of truth (no side-channel writes — principle 1
+            // in src/CLAUDE.md).
+            const cmdRuntime: CommandRuntime = {
+              appendUserMessage: (text: string) => {
+                void runtime.runPromise(
+                  ctx.events.append({ type: "user.message", content: text }),
+                );
+              },
+              registerHaltPredicate: (n: string, fn: HaltPredicate) => {
+                void runtime.runPromise(ctx.registerHaltPredicate(n, fn));
+              },
+              clearHaltPredicate: (n: string) => {
+                void runtime.runPromise(ctx.clearHaltPredicate(n));
+              },
+            };
+            // Run the handler outside the Effect fiber — handlers are
+            // user JS that may return a Promise. Return the promise so
+            // the outer `run` awaits it before resolving.
+            const result = cmd.handler({ args, runtime: cmdRuntime });
+            return result instanceof Promise ? result : Promise.resolve();
+          }
+          // Unknown command — warn once and fall through to the normal
+          // user.message path.
+          console.warn(
+            `[agentjsx] received slash input "/${name}" but no command with that name is registered; passing through as user.message`,
+          );
+        }
+      }
+
       const evs = yield* ctx.events.snapshot;
       if (toolsInFlight(evs)) {
         yield* pending.push(input);
-        return;
+        return null;
       }
       yield* ctx.events.append({ type: "user.message", content: input });
+      return null;
     });
     // Ensure the agent has finished building before sending — otherwise
     // seeded extensions could still be installing and a user message
@@ -288,7 +349,11 @@ export const createAgentRuntime = (opts: AgentOptions): Agent => {
     // resolves only after the append (or pending-sends push) has landed,
     // so callers that `await send` can safely subscribe to `until`
     // without a stale-replay race.
-    return built.then(() => runtime.runPromise(body));
+    return built.then(() =>
+      runtime.runPromise(body).then((handlerPromise) =>
+        handlerPromise ? handlerPromise : undefined,
+      ),
+    );
   };
 
   const until = <T>(predicate: (snapshot: AgentSnapshot) => T | null): Promise<T> => {

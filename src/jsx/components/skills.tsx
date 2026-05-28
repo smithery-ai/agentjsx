@@ -33,12 +33,24 @@ import { FileSystem, Path } from "@effect/platform";
 import { Effect, Schema } from "effect";
 import { defineTool } from "../../core/define-tool";
 import type { Fragment as RenderedFragment } from "../../core/types";
-import { emitFragment, emitTool, type Element, type Node } from "../runtime";
+import {
+  emitCommand,
+  emitFragment,
+  emitTool,
+  type Element,
+  type Node,
+} from "../runtime";
 import { useRenderContext } from "../render";
+
+interface SkillCommand {
+  name: string;
+  prompt: string;
+}
 
 interface SkillEntry {
   name: string;
   description: string;
+  commands: SkillCommand[];
 }
 
 interface CacheState {
@@ -96,21 +108,107 @@ function parseFrontmatterFields(raw: string): Record<string, string> {
   return out;
 }
 
+// Parse the `commands:` list out of a frontmatter block. Shape:
+//   commands:
+//     - name: review
+//       prompt: "Review the current diff."
+//     - name: ship
+//       prompt: "Land the current work as a PR."
+// Tiny indentation-aware parser; values may be quoted. Malformed
+// entries (missing `name` or `prompt`) are skipped with a warning.
+// Returns [] if the field is absent. Throws are caught at the call
+// site so a bad `commands:` block doesn't crash the component.
+function parseFrontmatterCommands(raw: string): SkillCommand[] {
+  const lines = raw.split(/\r?\n/);
+  let i = 0;
+  // Find the `commands:` line.
+  while (i < lines.length && !/^commands\s*:\s*$/.test(lines[i]!.trim())) i++;
+  if (i >= lines.length) return [];
+  i++;
+  const out: SkillCommand[] = [];
+  let current: Partial<SkillCommand> | null = null;
+  const stripQuotes = (v: string) => {
+    const t = v.trim();
+    if (
+      (t.startsWith('"') && t.endsWith('"')) ||
+      (t.startsWith("'") && t.endsWith("'"))
+    ) {
+      return t.slice(1, -1);
+    }
+    return t;
+  };
+  const flush = () => {
+    if (!current) return;
+    if (
+      typeof current.name === "string" &&
+      current.name.length > 0 &&
+      typeof current.prompt === "string" &&
+      current.prompt.length > 0
+    ) {
+      out.push({ name: current.name, prompt: current.prompt });
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[skills] skipping malformed command entry: ${JSON.stringify(current)}`,
+      );
+    }
+    current = null;
+  };
+  for (; i < lines.length; i++) {
+    const raw = lines[i]!;
+    const trimmed = raw.trim();
+    if (trimmed === "") continue;
+    // A non-indented line ends the commands block.
+    if (!/^\s/.test(raw)) break;
+    const itemMatch = /^\s*-\s*(.*)$/.exec(raw);
+    if (itemMatch) {
+      flush();
+      current = {};
+      const rest = itemMatch[1]!.trim();
+      if (rest.length > 0) {
+        const kv = /^([a-zA-Z_][\w-]*)\s*:\s*(.*)$/.exec(rest);
+        if (kv) {
+          const k = kv[1]!;
+          const v = stripQuotes(kv[2]!);
+          if (k === "name") current.name = v;
+          else if (k === "prompt") current.prompt = v;
+        }
+      }
+      continue;
+    }
+    if (!current) continue;
+    const kv = /^\s+([a-zA-Z_][\w-]*)\s*:\s*(.*)$/.exec(raw);
+    if (!kv) continue;
+    const k = kv[1]!;
+    const v = stripQuotes(kv[2]!);
+    if (k === "name") current.name = v;
+    else if (k === "prompt") current.prompt = v;
+  }
+  flush();
+  return out;
+}
+
 // Parse a skill file into its description (one-liner shown in the
-// `<skills>` menu) and body (full markdown the model sees on
-// `skill_lookup`/`skill_invoke`). If the file starts with a YAML
-// frontmatter block (`---\n...\n---\n`), the `description` field
-// supplies the menu line and the body is everything after the closing
-// fence. If no frontmatter is present, falls back to the heuristic:
-// description is the first non-heading, non-blank line; body is the
-// full file. Backwards-compatible with plain-markdown skill files.
+// `<skills>` menu), body (full markdown the model sees on
+// `skill_lookup`/`skill_invoke`), and any declared slash commands.
+// If the file starts with a YAML frontmatter block (`---\n...\n---\n`),
+// the `description` field supplies the menu line and `commands:` (if
+// present) defines slash commands the skill registers. The body is
+// everything after the closing fence. If no frontmatter is present,
+// falls back to the heuristic: description is the first non-heading,
+// non-blank line; body is the full file; no commands.
 export function parseSkillFile(content: string): {
   description: string;
   body: string;
+  commands: SkillCommand[];
 } {
   const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/.exec(content);
   if (!m) {
-    return { description: deriveDescription(content), body: content };
+    return {
+      description: deriveDescription(content),
+      body: content,
+      commands: [],
+    };
   }
   const frontmatterRaw = m[1]!;
   const body = m[2] ?? "";
@@ -119,7 +217,17 @@ export function parseSkillFile(content: string): {
     fields.description && fields.description.length > 0
       ? fields.description
       : deriveDescription(body);
-  return { description, body };
+  let commands: SkillCommand[] = [];
+  try {
+    commands = parseFrontmatterCommands(frontmatterRaw);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[skills] failed to parse commands frontmatter: ${e instanceof Error ? e.message : String(e)}`,
+    );
+    commands = [];
+  }
+  return { description, body, commands };
 }
 
 function listSkills(
@@ -142,8 +250,8 @@ function listSkills(
       const content = yield* fs
         .readFileString(skillFile)
         .pipe(Effect.catchAll(() => Effect.succeed("")));
-      const { description } = parseSkillFile(content);
-      out.push({ name: entry, description });
+      const { description, commands } = parseSkillFile(content);
+      out.push({ name: entry, description, commands });
     }
     out.sort((a, b) => a.name.localeCompare(b.name));
     return out;
@@ -249,7 +357,13 @@ export function Skills(props: SkillsProps): Node {
   } else if (state.entries.length === 0) {
     content = `<skills>\n(none)\n</skills>`;
   } else {
-    const lines = state.entries.map((s) => `- ${s.name}: ${s.description}`);
+    const lines: string[] = [];
+    for (const s of state.entries) {
+      lines.push(`- ${s.name}: ${s.description}`);
+      for (const c of s.commands) {
+        lines.push(`    /${c.name}`);
+      }
+    }
     content = `<skills>\n${lines.join("\n")}\n</skills>`;
   }
 
@@ -264,5 +378,30 @@ export function Skills(props: SkillsProps): Node {
     emitTool(skill_invoke),
     emitFragment(block),
   ];
+
+  // Emit one command per (skill, command) pair. Names are flat: collisions
+  // across skills are an operator concern. Description carries the skill
+  // name in brackets so operators can disambiguate when listing commands.
+  if (state.resolved) {
+    for (const s of state.entries) {
+      for (const c of s.commands) {
+        const oneLine = c.prompt.replace(/\s+/g, " ").trim();
+        const truncated =
+          oneLine.length > 80 ? `${oneLine.slice(0, 77)}...` : oneLine;
+        const prompt = c.prompt;
+        emits.push(
+          emitCommand({
+            name: c.name,
+            description: `[${s.name}] ${truncated}`,
+            handler: ({ args, runtime }) => {
+              runtime.appendUserMessage(
+                `${prompt}${args ? `\n\n${args}` : ""}`,
+              );
+            },
+          }),
+        );
+      }
+    }
+  }
   return emits as Node;
 }

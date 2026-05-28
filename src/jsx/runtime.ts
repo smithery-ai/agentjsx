@@ -76,13 +76,41 @@ export function createElement(
 // Modeled as an Element so the JSX tree stays homogeneous.
 export const EMIT_SENTINEL: ComponentFunction = () => null;
 
-export type EmitKind = "fragment" | "tool";
+// Commands are user-initiated: the operator types `/<name> <args>` into
+// `agent.run` and the runtime dispatches to a registered handler. They
+// differ from tools (model-initiated) and fragments (declarative prompt
+// content). A handler may register halt predicates imperatively via its
+// CommandRuntime; halt predicates are not emit values themselves because
+// the runtime owns their lifecycle, not the JSX walk.
+export interface Command {
+  readonly name: string;
+  readonly description?: string;
+  readonly handler: CommandHandler;
+}
+
+export type CommandHandler = (ctx: {
+  readonly args: string;
+  readonly runtime: CommandRuntime;
+}) => Promise<void> | void;
+
+export interface CommandRuntime {
+  appendUserMessage: (text: string) => void;
+  registerHaltPredicate: (name: string, fn: HaltPredicate) => void;
+  clearHaltPredicate: (name: string) => void;
+}
+
+export type HaltPredicate = (ctx: {
+  readonly events: ReadonlyArray<import("../core/types").Event>;
+  readonly infer: import("../core/types").InferFn;
+}) => Promise<{ ok: boolean; reason: string }>;
+
+export type EmitKind = "fragment" | "tool" | "command";
 
 export interface EmitElement extends Element {
   readonly type: typeof EMIT_SENTINEL;
   readonly props: {
     readonly __emit: EmitKind;
-    readonly value: RenderedFragment | Tool;
+    readonly value: RenderedFragment | Tool | Command;
   };
 }
 
@@ -98,6 +126,14 @@ export function emitTool(value: Tool): EmitElement {
   return {
     type: EMIT_SENTINEL,
     props: { __emit: "tool", value },
+    children: [],
+  };
+}
+
+export function emitCommand(value: Command): EmitElement {
+  return {
+    type: EMIT_SENTINEL,
+    props: { __emit: "command", value },
     children: [],
   };
 }

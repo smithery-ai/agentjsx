@@ -9,6 +9,7 @@
 import type { Effect } from "effect";
 import type { Event, Fragment as RenderedFragment, InferFn, Rendered, Tool } from "../core/types";
 import {
+  type Command,
   type ComponentFunction,
   type Element,
   type Node,
@@ -18,6 +19,7 @@ import {
 interface RenderCollector {
   fragments: RenderedFragment[];
   tools: Tool[];
+  commands: Command[];
 }
 
 // RenderContext is the ambient state visible to function components
@@ -91,7 +93,7 @@ export function useRenderContext(): RenderContext {
 }
 
 export function render(root: Node, context?: RenderContext): Rendered {
-  const collector: RenderCollector = { fragments: [], tools: [] };
+  const collector: RenderCollector = { fragments: [], tools: [], commands: [] };
   const previous = currentContext;
   // Precedence: explicit `context` arg wins (callers that thread their
   // own state stay in control), otherwise pick up the runtime-injected
@@ -104,7 +106,11 @@ export function render(root: Node, context?: RenderContext): Rendered {
   } finally {
     currentContext = previous;
   }
-  return { fragments: collector.fragments, tools: collector.tools };
+  return {
+    fragments: collector.fragments,
+    tools: collector.tools,
+    commands: collector.commands,
+  };
 }
 
 // Walk a child subtree into a fresh local collector and return the
@@ -124,10 +130,14 @@ export function render(root: Node, context?: RenderContext): Rendered {
 // the existing walker already takes its collector as an explicit
 // argument — see walk() below.
 export function renderChildren(children: Node | ReadonlyArray<Node>): Rendered {
-  const collector: RenderCollector = { fragments: [], tools: [] };
+  const collector: RenderCollector = { fragments: [], tools: [], commands: [] };
   // Array case is just a Node per the Node union; walk handles both.
   walk(children as Node, collector);
-  return { fragments: collector.fragments, tools: collector.tools };
+  return {
+    fragments: collector.fragments,
+    tools: collector.tools,
+    commands: collector.commands,
+  };
 }
 
 function walk(node: Node, collector: RenderCollector): void {
@@ -151,6 +161,8 @@ function walk(node: Node, collector: RenderCollector): void {
       collector.fragments.push(value as RenderedFragment);
     } else if (kind === "tool") {
       collector.tools.push(value as Tool);
+    } else if (kind === "command") {
+      collector.commands.push(value as Command);
     }
     return;
   }
