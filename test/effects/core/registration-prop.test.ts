@@ -1,9 +1,9 @@
 import fc from "fast-check";
 import { Chunk, Effect, Exit, Scope, SubscriptionRef } from "effect";
 import { describe, expect, it } from "vitest";
-import { AgentCtx } from "effectctx/agent-ctx";
-import { createAgentRuntime } from "effectctx";
-import type { InferFn, InferResponse, Tool } from "effectctx";
+import { AgentCtx } from "@flamecast/agentjsx/agent-ctx";
+import { createAgentRuntime } from "@flamecast/agentjsx";
+import type { InferFn, InferResponse, Tool } from "@flamecast/agentjsx";
 
 // Algebraic property tests for the extension lifecycle:
 //

@@ -3,8 +3,8 @@ import {
   createAgentRuntime,
   createInMemoryStore,
   fileSystem,
-} from "effectctx";
-import type { FileInfo, FileStore } from "effectctx";
+} from "@flamecast/agentjsx";
+import type { FileInfo, FileStore } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 const stubStore = (

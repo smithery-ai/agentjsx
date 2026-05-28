@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime } from "effectctx";
-import type { InferFn, InferResponse } from "effectctx";
+import { createAgentRuntime } from "@flamecast/agentjsx";
+import type { InferFn, InferResponse } from "@flamecast/agentjsx";
 
 // Property-test variant of `inference-consistency.test.ts`. That test
 // proves the FRP-glitch fix (see `src/inference.ts`: inference

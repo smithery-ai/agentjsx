@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clipMessages, createAgentRuntime } from "effectctx";
+import { clipMessages, createAgentRuntime } from "@flamecast/agentjsx";
 import { scriptedInfer } from "../helpers/scripted-infer";
 
 describe("agentctx: clipMessages extension", () => {

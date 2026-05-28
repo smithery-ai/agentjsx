@@ -1,7 +1,7 @@
 {
-  "name": "effectctx",
-  "version": "0.3.0",
-  "description": "an effect based agent harness",
+  "name": "@flamecast/agentjsx",
+  "version": "0.1.0",
+  "description": "Compose your agent's context like a React tree. JSX-driven LLM context with composable capability components on Effect.",
   "license": "MIT",
   "author": "Arjun Kumar",
   "type": "module",
@@ -14,10 +14,12 @@
     "url": "https://github.com/smithery-ai/agentctx/issues"
   },
   "keywords": [
-    "effect",
     "agent",
-    "runtime",
+    "jsx",
     "llm",
+    "context",
+    "effect",
+    "runtime",
     "ai-sdk",
     "mcp"
   ],
@@ -42,6 +44,14 @@
     "./components": {
       "types": "./src/jsx/index.ts",
       "default": "./src/jsx/index.ts"
+    },
+    "./jsx-runtime": {
+      "types": "./src/jsx/jsx-runtime.ts",
+      "default": "./src/jsx/jsx-runtime.ts"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./src/jsx/jsx-runtime.ts",
+      "default": "./src/jsx/jsx-runtime.ts"
     },
     "./compaction": {
       "types": "./src/compaction.ts",

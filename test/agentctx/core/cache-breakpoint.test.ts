@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime } from "effectctx";
-import type { Fragment, InferFn, ProviderContext } from "effectctx";
+import { createAgentRuntime } from "@flamecast/agentjsx";
+import type { Fragment, InferFn, ProviderContext } from "@flamecast/agentjsx";
 
 // Oracle tests for the auto-cache-breakpoint contract.
 //

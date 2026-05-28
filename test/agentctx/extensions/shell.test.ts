@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createAgentRuntime, shell } from "effectctx";
-import type { Shell } from "effectctx";
+import { createAgentRuntime, shell } from "@flamecast/agentjsx";
+import type { Shell } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 const mountShell = (

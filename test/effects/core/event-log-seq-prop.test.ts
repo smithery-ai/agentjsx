@@ -1,8 +1,8 @@
 import fc from "fast-check";
 import { Chunk, Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { makeEventLog } from "effectctx/event-log";
-import type { EventInput } from "effectctx/event-log";
+import { makeEventLog } from "@flamecast/agentjsx/event-log";
+import type { EventInput } from "@flamecast/agentjsx/event-log";
 
 // Algebraic property test for `EventLog`'s seq monotonicity contract:
 //

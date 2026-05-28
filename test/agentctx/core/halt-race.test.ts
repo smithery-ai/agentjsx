@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import { AgentCtx, createAgentRuntime } from "effectctx";
-import type { Event, Tool } from "effectctx";
+import { AgentCtx, createAgentRuntime } from "@flamecast/agentjsx";
+import type { Event, Tool } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 // Predicate helpers. Each returns T|null so it slots into `agent.until`.

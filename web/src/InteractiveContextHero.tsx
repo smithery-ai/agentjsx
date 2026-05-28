@@ -2,12 +2,12 @@ import { useState } from "react"
 import { HeroCodeBlock } from "./HeroCodeBlock"
 
 // The hero snippet. Line indices below are 0-based against this string.
-export const CODE = `import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentctx"
+export const CODE = `import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
 import {
   Agent, Block, Messages,
   Workspace, Skills, McpServer,
   Todo, Errors, GitState,
-} from "@flamecast/agentctx/components"
+} from "@flamecast/agentjsx/components"
 
 const agent = createAgentRuntime({
   infer: createAiGatewayInfer({ model: "anthropic/claude-sonnet-4-6" }),

@@ -1,7 +1,7 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { reconcileHydrationDangling } from "effectctx/hydration";
-import type { Event, ToolCall } from "effectctx/types";
+import { reconcileHydrationDangling } from "@flamecast/agentjsx/hydration";
+import type { Event, ToolCall } from "@flamecast/agentjsx/types";
 
 // Algebraic property test for `reconcileHydrationDangling`. Proves the
 // structural laws hydration must satisfy:

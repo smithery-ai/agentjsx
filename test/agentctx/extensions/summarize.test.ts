@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { createAgentRuntime, summarize } from "effectctx";
-import type { Fragment, InferFn } from "effectctx";
+import { createAgentRuntime, summarize } from "@flamecast/agentjsx";
+import type { Fragment, InferFn } from "@flamecast/agentjsx";
 import { scriptedInfer } from "../helpers/scripted-infer";
 
 const waitForAssistantCount = async (

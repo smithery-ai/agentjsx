@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { compact, createAgentRuntime } from "effectctx";
-import type { Fragment, InferFn } from "effectctx";
+import { compact, createAgentRuntime } from "@flamecast/agentjsx";
+import type { Fragment, InferFn } from "@flamecast/agentjsx";
 import { scriptedInfer, toolCall } from "../helpers/scripted-infer";
 
 describe("agentctx: compact extension", () => {
