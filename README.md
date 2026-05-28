@@ -1,4 +1,4 @@
-# agentjsx
+# agentjsx (experimental)
 
 Compose agents using JSX.
 
