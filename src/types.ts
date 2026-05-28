@@ -147,6 +147,16 @@ export type Fragment = {
   [K in keyof FragmentMap]: FragmentMap[K] & { tag: K; source: string };
 }[keyof FragmentMap];
 
+// Output of the JSX render walk (see `src/jsx/render.ts`). Components
+// emit into one of these channels via `emitFragment` / `emitTool`. The
+// runtime consumes a `Rendered` to seed `ctx.ambients` and `ctx.tools`
+// at startup. Additional channels (transforms, forked effects) are
+// reserved for future stages — not implemented yet.
+export interface Rendered {
+  readonly fragments: ReadonlyArray<Fragment>;
+  readonly tools: ReadonlyArray<Tool>;
+}
+
 export interface InferResponse {
   content: string;
   tool_calls?: ToolCall[];

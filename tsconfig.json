@@ -11,7 +11,10 @@
     "types": ["node"],
     "lib": ["ESNext"],
     "rootDir": ".",
-    "baseUrl": "."
+    "baseUrl": ".",
+    "jsx": "react",
+    "jsxFactory": "createElement",
+    "jsxFragmentFactory": "Fragment"
   },
   "include": ["src", "test"]
 }
