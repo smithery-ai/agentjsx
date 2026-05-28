@@ -9,5 +9,4 @@ export {
   emitTool,
 } from "./runtime";
 export type { ComponentFunction, Element, Node } from "./runtime";
-export { Agent, Block, Messages } from "./components";
-export { Todo, Workspace } from "./capabilities";
+export * from "./components";

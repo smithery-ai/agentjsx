@@ -218,5 +218,9 @@ const eventContent = (e: Event): string => {
       return e.text;
     case "tool.call.started":
       return "";
+    case "todo.added":
+      return e.text;
+    case "todo.completed":
+      return `[todo.completed index=${e.index}]`;
   }
 };

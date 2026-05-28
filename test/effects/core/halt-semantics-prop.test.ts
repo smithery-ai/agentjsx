@@ -101,6 +101,10 @@ const buildLog = (shapes: ReadonlyArray<EventInput>): Event[] =>
               toSeq: s.toSeq,
               text: s.text,
             };
+      case "todo.added":
+        return { seq: i, type: "todo.added", text: s.text };
+      case "todo.completed":
+        return { seq: i, type: "todo.completed", index: s.index };
     }
   });
 

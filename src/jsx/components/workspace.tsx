@@ -1,5 +1,5 @@
-// Capability components — declare tools and ambient fragments that
-// grant the agent power over external systems. These are real,
+// Capability component — declares tools and an ambient fragment that
+// grant the agent power over the local filesystem and shell. Real,
 // platform-backed implementations: tool `run` bodies invoke Effect
 // workflows that depend on `FileSystem`, `Path`, and `CommandExecutor`
 // from `@effect/platform`. The agent runtime injects those services
@@ -9,10 +9,10 @@
 
 import { Command, FileSystem, Path } from "@effect/platform";
 import { Effect, Schema, Stream } from "effect";
-import { defineTool } from "../define-tool";
-import type { Fragment as RenderedFragment } from "../types";
-import { emitFragment, emitTool, type Element, type Node } from "./runtime";
-import { useRenderContext } from "./render";
+import { defineTool } from "../../define-tool";
+import type { Fragment as RenderedFragment } from "../../types";
+import { emitFragment, emitTool, type Element, type Node } from "../runtime";
+import { useRenderContext } from "../render";
 
 // ---------------------------------------------------------------------
 // <Workspace root="..." />
@@ -277,79 +277,6 @@ export function Workspace(props: WorkspaceProps): Node {
     emitTool(write_file),
     emitTool(grep),
     emitTool(list_dir),
-    emitFragment(block),
-  ];
-  return emits as Node;
-}
-
-// ---------------------------------------------------------------------
-// <Todo />
-//
-// Two tools (todo_add, todo_complete) and an ambient system block
-// showing the current list.
-//
-// MVP state: a module-level array. ONE Todo across all agents in a
-// process. Real fix is to record todo.added / todo.completed events in
-// the agent's event log and derive state via a projection (the
-// repo-wide "log is source of truth" rule). Punted to a follow-up to
-// keep stage 2 surgical.
-// ---------------------------------------------------------------------
-
-interface TodoItem {
-  text: string;
-  done: boolean;
-}
-
-const todoItems: TodoItem[] = [];
-
-export function Todo(_props: Record<string, never> = {}): Node {
-  void _props;
-
-  const todo_add = defineTool({
-    name: "todo_add",
-    description: "Append an item to the todo list.",
-    parameters: Schema.Struct({
-      text: Schema.String,
-    }),
-    run: async ({ text }) => {
-      todoItems.push({ text, done: false });
-      return "ok";
-    },
-  });
-
-  const todo_complete = defineTool({
-    name: "todo_complete",
-    description: "Mark a todo item as completed by its 0-based index.",
-    parameters: Schema.Struct({
-      index: Schema.Number,
-    }),
-    run: async ({ index }) => {
-      const item = todoItems[index];
-      if (!item) return `Error: no todo at index ${index}`;
-      item.done = true;
-      return "ok";
-    },
-  });
-
-  const inner =
-    todoItems.length === 0
-      ? "(none)"
-      : todoItems
-          .map(
-            (item, i) =>
-              `[${item.done ? "x" : " "}] ${i}: ${item.text}`,
-          )
-          .join("\n");
-
-  const block: RenderedFragment = {
-    tag: "core/system",
-    content: `<todo>\n${inner}\n</todo>`,
-    source: "todo",
-  };
-
-  const emits: Element[] = [
-    emitTool(todo_add),
-    emitTool(todo_complete),
     emitFragment(block),
   ];
   return emits as Node;

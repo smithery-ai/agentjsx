@@ -65,6 +65,8 @@ export const EVENT_META: { readonly [K in Event["type"]]: EventMeta } = {
   "assistant.halted":   { projectable: true,  hiddenByRecall: false, structural: false },
   "inference.failed":   { projectable: true,  hiddenByRecall: false, structural: false },
   "compaction.summary": { projectable: false, hiddenByRecall: true,  structural: true  },
+  "todo.added":         { projectable: false, hiddenByRecall: true,  structural: true  },
+  "todo.completed":     { projectable: false, hiddenByRecall: true,  structural: true  },
 };
 
 const PROJECTORS: ProjectorTable = {
@@ -114,6 +116,11 @@ const PROJECTORS: ProjectorTable = {
   // seq (see renderHistoryFragments) so it appears where the compacted
   // range USED to be, not where the compaction marker was appended later.
   "compaction.summary": () => null,
+  // Todo state mutations are internal — the `<Todo>` block reduces over
+  // them at render time to derive its ambient content. They never
+  // surface as messages in the history stream.
+  "todo.added": () => null,
+  "todo.completed": () => null,
 };
 
 // Project a single event to its LLM-facing fragment, or `null` for events

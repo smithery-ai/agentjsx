@@ -102,6 +102,12 @@ export type Event = { seq: number } & (
       text: string;
       prompt?: string;
     }
+  // Todo state mutations emitted by the `<Todo>` component's tools. Not
+  // projected into the LLM-facing message stream — they're internal
+  // state for the Todo block's ambient render. The block reduces over
+  // these events at render time to derive the current items list.
+  | { readonly type: "todo.added"; readonly text: string }
+  | { readonly type: "todo.completed"; readonly index: number }
 );
 
 // Fragments are the LLM-facing projection of events + extension contributions,

@@ -15,9 +15,23 @@
 
 import { NodeContext, NodeRuntime } from "@effect/platform-node"
 import { createAgentRuntime, createAiGatewayInfer, render } from "@flamecast/agentjsx"
-import { Agent, Block, Messages, Todo, Workspace } from "@flamecast/agentjsx/components"
+import {
+	Agent,
+	Block,
+	Compact,
+	Messages,
+	Skills,
+	Todo,
+	Workspace,
+} from "@flamecast/agentjsx/components"
 import { Console, Effect } from "effect"
+import path from "node:path"
 import { createInterface, type Interface as ReadlineInterface } from "node:readline/promises"
+import { fileURLToPath } from "node:url"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const SKILLS_ROOT = path.resolve(__dirname, "./skills")
 
 const DIM = (s: string) => `\x1b[2m${s}\x1b[0m`
 const BLUE = (s: string) => `\x1b[34m${s}\x1b[0m`
@@ -85,11 +99,15 @@ const program = Effect.gen(function* () {
 				<Agent>
 					<Block name="role">
 						You are a helpful coding assistant working in the current directory. Use
-						tools to inspect and modify files. Track multi-step work as todos.
+						tools to inspect and modify files. Track multi-step work as todos. Look
+						up skills for guidance on conventions.
 					</Block>
 					<Workspace root="./" />
+					<Skills root={SKILLS_ROOT} />
 					<Todo />
-					<Messages />
+					<Compact strategy="truncate-tool-outputs" limit={800}>
+						<Messages />
+					</Compact>
 				</Agent>,
 			),
 	})
