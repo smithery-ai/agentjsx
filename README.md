@@ -1,6 +1,6 @@
 # agentjsx
 
-JSX-driven LLM context. Compose your agent like a React tree.
+Compose agents using JSX.
 
 ## Install
 
