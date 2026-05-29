@@ -140,7 +140,8 @@
   },
   "scripts": {
     "check-types": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dev": "pnpm -C web dev"
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "^2.8.0",

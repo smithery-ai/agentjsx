@@ -14,10 +14,6 @@ import {
   Agent, Messages, emitFragment, emitHaltPredicate,
 } from "@flamecast/agentjsx/components"
 
-// Claude-Code-style /goal. The agent can't call a "done" tool — it
-// doesn't have one. Halting is gated by an independent inference call
-// that judges the transcript against the condition. The model sees
-// the goal in its system block, but completion is decided externally.
 function Goal({ condition }: { condition: string }) {
   return [
     emitFragment({
@@ -39,15 +35,7 @@ function Goal({ condition }: { condition: string }) {
       return JSON.parse(res.content)
     }),
   ]
-}
-
-// Drop it in like any built-in component:
-render(
-  <Agent>
-    <Goal condition="every TODO has a Linear ticket" />
-    <Messages />
-  </Agent>
-)`
+}`
 
 function LandingHeader() {
 	return (
@@ -74,14 +62,6 @@ function CopyPromptCta() {
 		</button>
 	)
 }
-
-const LINKS = [
-	{
-		href: "https://github.com/smithery-ai/agentjsx",
-		label: "GitHub",
-		desc: "Source, issues, and the full extension catalog.",
-	},
-]
 
 export function Landing() {
 	return (
@@ -125,11 +105,13 @@ export function Landing() {
 							Build your own components.
 						</h2>
 						<p className="landing-build-lede">
-							Components are functions that contribute tools,
-							prompt content, or both. Some wrap others to
-							reshape what they produce. Drop them inside{" "}
-							<code>{"<Agent>"}</code>; the runtime handles
-							diffing and tool reconciliation between renders.
+							A component defines a slice of your agent: what
+							it sees in its context, what it can do, or both.
+							The Goal component does both at once: it drops the
+							goal into the system prompt, and it blocks the
+							agent from halting until the goal is met. Compose
+							them by nesting inside <code>{"<Agent>"}</code>,
+							the way you'd nest React components.
 						</p>
 					</div>
 					<div className="landing-code-section">
@@ -138,29 +120,6 @@ export function Landing() {
 							filename="goal.tsx"
 						/>
 					</div>
-				</section>
-
-				<section
-					className="landing-section"
-					aria-labelledby="section-where"
-				>
-					<h2 id="section-where" className="caption">
-						Where to go
-					</h2>
-					<ul className="landing-links">
-						{LINKS.map(l => (
-							<li key={l.href}>
-								<a href={l.href}>
-									<span className="landing-link-label">
-										{l.label}
-									</span>
-									<span className="landing-link-desc">
-										{l.desc}
-									</span>
-								</a>
-							</li>
-						))}
-					</ul>
 				</section>
 			</main>
 		</div>
